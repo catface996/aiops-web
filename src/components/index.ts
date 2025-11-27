@@ -1,1 +1,5 @@
 export { AuthGuard } from './AuthGuard'
+export { PasswordStrength } from './PasswordStrength'
+export type { PasswordStrengthProps } from './PasswordStrength'
+export { ErrorBoundary } from './ErrorBoundary'
+export type { ErrorBoundaryProps } from './ErrorBoundary'

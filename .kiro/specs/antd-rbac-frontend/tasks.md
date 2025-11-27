@@ -148,34 +148,38 @@
   - _需求: 4.2_
   - **验证报告**: [task-17.md](./task-verify-report/task-17.md)
 
-- [ ] 18. 实现 PasswordStrength 组件
+- [x] 18. 实现 PasswordStrength 组件 ✅
   - 接收 password, username, email 作为 props
   - 实时计算密码强度（弱、中、强）
   - 显示强度指示器（红色、黄色、绿色）
   - 显示具体的错误提示
   - **验证方法**: 【单元测试】测试不同密码输入的强度显示
   - _需求: 14.1, 14.2, 14.3, 14.4, 14.5_
+  - **验证报告**: [task-18.md](./task-verify-report/task-18.md)
 
-- [ ] 19. 编写 PasswordStrength 的属性测试
+- [x] 19. 编写 PasswordStrength 的属性测试 ✅
   - 编写密码强度实时更新属性测试（属性 17）
   - **验证方法**: 【单元测试】执行 `npm test` 确保属性测试通过
   - _需求: 14.1, 14.5_
+  - **验证报告**: [task-19.md](./task-verify-report/task-19.md)
 
-- [ ] 20. 实现 ErrorBoundary 组件
+- [x] 20. 实现 ErrorBoundary 组件 ✅
   - 实现 componentDidCatch 捕获组件错误
   - 显示友好的错误页面
   - 记录错误到控制台
   - **验证方法**: 【单元测试】触发错误，验证 ErrorBoundary 正确捕获
   - _需求: 8.3_
+  - **验证报告**: [task-20.md](./task-verify-report/task-20.md)
 
-- [ ] 21. 实现 UserLayout 布局
+- [x] 21. 实现 UserLayout 布局 ✅
   - 创建用于登录、注册页面的简单布局
   - 居中显示表单
   - 显示系统标题和 Logo
   - **验证方法**: 【运行时验证】启动应用，访问登录页，验证布局正确显示
   - _需求: 1.1, 2.1_
+  - **验证报告**: [task-21.md](./task-verify-report/task-21.md)
 
-- [ ] 22. 实现 BasicLayout 布局
+- [x] 22. 实现 BasicLayout 布局 ✅
   - 使用 Ant Design Pro 的 ProLayout 组件
   - 配置顶部导航栏（显示用户信息、主题切换、退出按钮）
   - 配置侧边菜单（根据用户角色动态生成）
@@ -184,17 +188,20 @@
   - 实现主题切换功能
   - **验证方法**: 【运行时验证】启动应用，登录后验证布局、菜单、主题切换功能
   - _需求: 5.1, 7.1, 7.4, 7.5, 7.6_
+  - **验证报告**: [task-22.md](./task-verify-report/task-22.md)
 
-- [ ] 23. 编写 BasicLayout 的属性测试
+- [x] 23. 编写 BasicLayout 的属性测试 ✅
   - 编写菜单基于角色显示属性测试（属性 15）
   - **验证方法**: 【单元测试】执行 `npm test` 确保属性测试通过
   - _需求: 5.1_
+  - **验证报告**: [task-23.md](./task-verify-report/task-23.md)
 
-- [ ] 24. 实现 BlankLayout 布局
+- [x] 24. 实现 BlankLayout 布局 ✅
   - 创建用于 404、403 页面的空白布局
   - 仅渲染子组件
   - **验证方法**: 【运行时验证】访问 404 页面，验证布局正确
   - _需求: 15.5_
+  - **验证报告**: [task-24.md](./task-verify-report/task-24.md)
 
 - [ ] 25. 实现注册页面
   - 使用 Ant Design Form 组件
