@@ -142,10 +142,11 @@
   - _需求: 4.2, 4.3, 15.1, 15.5_
   - **验证报告**: [task-16.md](./task-verify-report/task-16.md)
 
-- [ ] 17. 编写路由配置的属性测试
+- [x] 17. 编写路由配置的属性测试 ✅
   - 编写路由根据角色过滤属性测试（属性 10）
   - **验证方法**: 【单元测试】执行 `npm test` 确保属性测试通过
   - _需求: 4.2_
+  - **验证报告**: [task-17.md](./task-verify-report/task-17.md)
 
 - [ ] 18. 实现 PasswordStrength 组件
   - 接收 password, username, email 作为 props
