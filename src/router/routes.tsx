@@ -4,8 +4,9 @@
  */
 import { lazy } from 'react'
 import type { RouteConfig } from '@/types'
+import { UserLayout, BasicLayout, BlankLayout } from '@/layouts'
 
-// 懒加载页面组件（占位，后续任务实现具体页面）
+// 懒加载页面组件
 const LoginPage = lazy(() => import('@/pages/Login'))
 const RegisterPage = lazy(() => import('@/pages/Register'))
 const DashboardPage = lazy(() => import('@/pages/Dashboard'))
@@ -21,25 +22,41 @@ const NotFoundPage = lazy(() => import('@/pages/404'))
 export const publicRoutes: RouteConfig[] = [
   {
     path: '/login',
-    element: <LoginPage />,
+    element: (
+      <UserLayout>
+        <LoginPage />
+      </UserLayout>
+    ),
     name: '登录',
     hideInMenu: true,
   },
   {
     path: '/register',
-    element: <RegisterPage />,
+    element: (
+      <UserLayout>
+        <RegisterPage />
+      </UserLayout>
+    ),
     name: '注册',
     hideInMenu: true,
   },
   {
     path: '/403',
-    element: <ForbiddenPage />,
+    element: (
+      <BlankLayout>
+        <ForbiddenPage />
+      </BlankLayout>
+    ),
     name: '无权限',
     hideInMenu: true,
   },
   {
     path: '/404',
-    element: <NotFoundPage />,
+    element: (
+      <BlankLayout>
+        <NotFoundPage />
+      </BlankLayout>
+    ),
     name: '页面不存在',
     hideInMenu: true,
   },
@@ -52,20 +69,32 @@ export const publicRoutes: RouteConfig[] = [
 export const protectedRoutes: RouteConfig[] = [
   {
     path: '/dashboard',
-    element: <DashboardPage />,
+    element: (
+      <BasicLayout>
+        <DashboardPage />
+      </BasicLayout>
+    ),
     requireAuth: true,
     name: '仪表盘',
   },
   {
     path: '/users',
-    element: <UsersPage />,
+    element: (
+      <BasicLayout>
+        <UsersPage />
+      </BasicLayout>
+    ),
     requireAuth: true,
     requiredRoles: ['ROLE_ADMIN'],
     name: '用户管理',
   },
   {
     path: '/audit',
-    element: <AuditPage />,
+    element: (
+      <BasicLayout>
+        <AuditPage />
+      </BasicLayout>
+    ),
     requireAuth: true,
     requiredRoles: ['ROLE_ADMIN'],
     name: '审计日志',

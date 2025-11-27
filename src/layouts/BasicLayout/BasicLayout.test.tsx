@@ -7,16 +7,21 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { BasicLayout } from './index'
 import { AuthProvider } from '@/contexts/AuthContext'
-import { storage } from '@/utils/storage'
+import { themeStorage, sidebarStorage } from '@/utils/storage'
 
 // Mock storage module
 vi.mock('@/utils/storage', () => ({
-  storage: {
-    getTheme: vi.fn(() => 'light'),
-    setTheme: vi.fn(),
-    getSidebarCollapsed: vi.fn(() => false),
-    setSidebarCollapsed: vi.fn(),
-    clear: vi.fn(),
+  themeStorage: {
+    get: vi.fn(() => 'light'),
+    set: vi.fn(),
+    remove: vi.fn(),
+  },
+  sidebarStorage: {
+    getCollapsed: vi.fn(() => false),
+    setCollapsed: vi.fn(),
+    getWidth: vi.fn(() => 256),
+    setWidth: vi.fn(),
+    remove: vi.fn(),
   },
   tokenStorage: {
     get: vi.fn(() => null),
@@ -28,15 +33,21 @@ vi.mock('@/utils/storage', () => ({
     set: vi.fn(),
     remove: vi.fn(),
   },
+  clearAuthStorage: vi.fn(),
 }))
 
 // 用于测试中获取 mock
-const mockStorage = storage as {
-  getTheme: ReturnType<typeof vi.fn>
-  setTheme: ReturnType<typeof vi.fn>
-  getSidebarCollapsed: ReturnType<typeof vi.fn>
-  setSidebarCollapsed: ReturnType<typeof vi.fn>
-  clear: ReturnType<typeof vi.fn>
+const mockThemeStorage = themeStorage as {
+  get: ReturnType<typeof vi.fn>
+  set: ReturnType<typeof vi.fn>
+  remove: ReturnType<typeof vi.fn>
+}
+const mockSidebarStorage = sidebarStorage as {
+  getCollapsed: ReturnType<typeof vi.fn>
+  setCollapsed: ReturnType<typeof vi.fn>
+  getWidth: ReturnType<typeof vi.fn>
+  setWidth: ReturnType<typeof vi.fn>
+  remove: ReturnType<typeof vi.fn>
 }
 
 // Mock useAuth hook
@@ -84,8 +95,8 @@ describe('BasicLayout Component', () => {
     // 重置 mockUser
     mockUserRoles = ['ROLE_USER']
     // 重置 storage mock
-    mockStorage.getTheme.mockReturnValue('light')
-    mockStorage.getSidebarCollapsed.mockReturnValue(false)
+    mockThemeStorage.get.mockReturnValue('light')
+    mockSidebarStorage.getCollapsed.mockReturnValue(false)
   })
 
   afterEach(() => {
@@ -158,12 +169,12 @@ describe('BasicLayout Component', () => {
 
       // 点击切换到深色模式
       fireEvent.click(switchElement)
-      expect(mockStorage.setTheme).toHaveBeenCalledWith('dark')
+      expect(mockThemeStorage.set).toHaveBeenCalledWith('dark')
     })
 
     it('should persist theme preference', () => {
       // 预设深色模式
-      mockStorage.getTheme.mockReturnValue('dark')
+      mockThemeStorage.get.mockReturnValue('dark')
 
       renderWithProviders(<BasicLayout />)
       const switchElement = screen.getByRole('switch')
@@ -199,12 +210,12 @@ describe('BasicLayout Component', () => {
   describe('Responsive layout', () => {
     it('should persist sidebar collapsed state', () => {
       // 预设折叠状态
-      mockStorage.getSidebarCollapsed.mockReturnValue(true)
+      mockSidebarStorage.getCollapsed.mockReturnValue(true)
 
       renderWithProviders(<BasicLayout />)
 
       // 验证 storage 被调用
-      expect(mockStorage.getSidebarCollapsed).toHaveBeenCalled()
+      expect(mockSidebarStorage.getCollapsed).toHaveBeenCalled()
     })
   })
 

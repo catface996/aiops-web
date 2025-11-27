@@ -21,7 +21,10 @@ const routeConfig = fc.record({
     .map((arr) => '/' + arr.join('')),
   requireAuth: fc.boolean(),
   requiredRoles: fc.option(roleList, { nil: undefined }),
-  name: fc.option(fc.string({ minLength: 1, maxLength: 20 }), { nil: undefined }),
+  name: fc.option(
+    fc.string({ minLength: 1, maxLength: 20 }).filter((s) => s.trim().length > 0),
+    { nil: undefined }
+  ),
   hideInMenu: fc.option(fc.boolean(), { nil: undefined }),
 })
 

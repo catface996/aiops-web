@@ -20,7 +20,7 @@ import {
 } from '@ant-design/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { usePermission } from '@/hooks/usePermission'
-import { storage } from '@/utils/storage'
+import { themeStorage, sidebarStorage } from '@/utils/storage'
 import type { UserRole } from '@/types'
 
 const { Text } = Typography
@@ -62,18 +62,18 @@ export const BasicLayout: React.FC<BasicLayoutProps> = ({ children }) => {
   const { hasRole } = usePermission()
 
   // 主题状态
-  const [isDarkMode, setIsDarkMode] = useState(() => storage.getTheme() === 'dark')
+  const [isDarkMode, setIsDarkMode] = useState(() => themeStorage.get() === 'dark')
   // 侧边栏折叠状态
-  const [collapsed, setCollapsed] = useState(() => storage.getSidebarCollapsed())
+  const [collapsed, setCollapsed] = useState(() => sidebarStorage.getCollapsed())
 
   // 保存主题偏好
   useEffect(() => {
-    storage.setTheme(isDarkMode ? 'dark' : 'light')
+    themeStorage.set(isDarkMode ? 'dark' : 'light')
   }, [isDarkMode])
 
   // 保存侧边栏状态
   useEffect(() => {
-    storage.setSidebarCollapsed(collapsed)
+    sidebarStorage.setCollapsed(collapsed)
   }, [collapsed])
 
   // 处理退出登录
