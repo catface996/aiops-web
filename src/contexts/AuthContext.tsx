@@ -3,7 +3,7 @@
  * 需求: 2.2, 2.6, 3.1, 3.2, 4.1
  */
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
-import type { User, LoginRequest, RegisterRequest } from '@/types'
+import type { User, LoginRequest, RegisterRequest, BackendUserInfo } from '@/types'
 import { login as loginApi, logout as logoutApi, register as registerApi } from '@/services/auth'
 import { validateSession } from '@/services/session'
 import { tokenStorage, userStorage, clearAuthStorage } from '@/utils/storage'
@@ -71,6 +71,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [])
 
   /**
+   * 将后端用户信息转换为前端 User 类型
+   */
+  const mapBackendUserToUser = (backendUser: BackendUserInfo): User => ({
+    userId: backendUser.accountId,
+    username: backendUser.username,
+    email: backendUser.email,
+    role: backendUser.role as User['role'],
+    createdAt: backendUser.createdAt,
+    lastLoginAt: backendUser.lastLoginAt,
+  })
+
+  /**
    * 登录方法
    * 需求 2.2: 调用后端登录 API
    * 需求 2.6: 将 Token 和用户信息存储到 LocalStorage
@@ -78,11 +90,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(async (data: LoginRequest) => {
     const response = await loginApi(data)
 
+    // 转换后端用户信息为前端格式
+    const user = mapBackendUserToUser(response.userInfo)
+
     // 存储 Token 和用户信息
     tokenStorage.set(response.token)
-    userStorage.set(response.user)
+    userStorage.set(user)
 
-    setUser(response.user)
+    setUser(user)
   }, [])
 
   /**

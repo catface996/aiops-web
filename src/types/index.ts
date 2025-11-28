@@ -11,6 +11,7 @@ export type {
   RegisterResponse,
   LoginRequest,
   LoginResponse,
+  BackendUserInfo,
   LogoutResponse,
   ValidateSessionResponse,
   ForceLogoutOthersResponse,

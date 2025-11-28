@@ -50,11 +50,27 @@ export interface LoginRequest {
 }
 
 /**
- * 登录响应
+ * 后端返回的用户信息（与前端 User 字段名不同）
+ */
+export interface BackendUserInfo {
+  accountId: number
+  username: string
+  email: string
+  role: string
+  status: string
+  createdAt?: string
+  lastLoginAt?: string
+}
+
+/**
+ * 登录响应（匹配后端 API 返回结构）
  */
 export interface LoginResponse {
   token: string
-  user: User
+  userInfo: BackendUserInfo
+  sessionId: string
+  expiresAt: string
+  message?: string
 }
 
 /**

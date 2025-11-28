@@ -3,7 +3,7 @@
  * 捕获子组件中的 JavaScript 错误，显示友好的错误页面
  * 需求: 8.3
  */
-import React, { Component, ErrorInfo, ReactNode } from 'react'
+import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { Result, Button } from 'antd'
 
 export interface ErrorBoundaryProps {

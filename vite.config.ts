@@ -36,6 +36,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 3000,
+      strictPort: true, // 禁止端口被占用时自动使用其他端口
       proxy: {
         '/api/v1': {
           target: 'http://localhost:8080',
