@@ -1,15 +1,17 @@
 /**
  * 会话过期警告组件
  * 任务 22: 实现会话过期警告组件
- * 需求: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10
+ * 任务 35: 响应式设计优化
+ * 需求: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10, 10.4, 10.5, 10.6
  */
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { Modal, Button, Typography, Space, Progress } from 'antd'
+import { Modal, Button, Typography, Space, Progress, Grid } from 'antd'
 import { ClockCircleOutlined, LogoutOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useAuth } from '@/hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 
 const { Text, Title } = Typography
+const { useBreakpoint } = Grid
 
 export interface SessionExpiryWarningProps {
   /** 会话过期时间（毫秒时间戳） */
@@ -48,6 +50,10 @@ export const SessionExpiryWarning: React.FC<SessionExpiryWarningProps> = ({
 }) => {
   const navigate = useNavigate()
   const { logout, isAuthenticated } = useAuth()
+  const screens = useBreakpoint()
+
+  // 移动端检测
+  const isMobile = !screens.md
 
   // 状态
   const [visible, setVisible] = useState(false)
@@ -164,12 +170,17 @@ export const SessionExpiryWarning: React.FC<SessionExpiryWarningProps> = ({
   // 计算进度百分比
   const progressPercent = Math.max(0, Math.min(100, (countdown / warningBeforeSeconds) * 100))
 
+  // 响应式尺寸
+  const progressSize = isMobile ? 120 : 150
+  const titleLevel = isMobile ? 3 : 2
+  const buttonStyle = isMobile ? { minHeight: 44, minWidth: 100 } : {}
+
   return (
     <Modal
       title={
         <Space>
-          <ClockCircleOutlined style={{ color: '#faad14' }} />
-          <span>会话即将过期</span>
+          <ClockCircleOutlined style={{ color: '#faad14', fontSize: isMobile ? 18 : 20 }} />
+          <span style={{ fontSize: isMobile ? 16 : 18 }}>会话即将过期</span>
         </Space>
       }
       open={visible}
@@ -178,40 +189,41 @@ export const SessionExpiryWarning: React.FC<SessionExpiryWarningProps> = ({
       keyboard={false}
       footer={null}
       centered
+      width={isMobile ? '90%' : 420}
       data-testid="session-expiry-warning"
     >
-      <div style={{ textAlign: 'center', padding: '20px 0' }}>
+      <div style={{ textAlign: 'center', padding: isMobile ? '16px 0' : '20px 0' }}>
         <Progress
           type="circle"
           percent={progressPercent}
           format={() => (
             <div>
-              <Title level={2} style={{ margin: 0 }} data-testid="countdown-display">
+              <Title level={titleLevel} style={{ margin: 0 }} data-testid="countdown-display">
                 {formatCountdown(countdown)}
               </Title>
-              <Text type="secondary">剩余时间</Text>
+              <Text type="secondary" style={{ fontSize: isMobile ? 12 : 14 }}>剩余时间</Text>
             </div>
           )}
           strokeColor={{
             '0%': '#108ee9',
             '100%': '#faad14',
           }}
-          size={150}
+          size={progressSize}
         />
 
-        <div style={{ marginTop: 24 }}>
-          <Text>
+        <div style={{ marginTop: isMobile ? 16 : 24 }}>
+          <Text style={{ wordBreak: 'break-word' }}>
             您的会话即将在 <Text strong>{formatCountdown(countdown)}</Text> 后过期
           </Text>
         </div>
         <div style={{ marginTop: 8 }}>
-          <Text type="secondary">
+          <Text type="secondary" style={{ wordBreak: 'break-word' }}>
             请选择延长会话或立即登出
           </Text>
         </div>
 
-        <div style={{ marginTop: 24 }}>
-          <Space size="middle">
+        <div style={{ marginTop: isMobile ? 16 : 24 }}>
+          <Space size="middle" wrap direction={isMobile ? 'vertical' : 'horizontal'} style={{ width: isMobile ? '100%' : 'auto' }}>
             {onRefreshSession && (
               <Button
                 type="primary"
@@ -219,6 +231,8 @@ export const SessionExpiryWarning: React.FC<SessionExpiryWarningProps> = ({
                 onClick={handleExtendSession}
                 loading={refreshing}
                 data-testid="extend-session-btn"
+                style={buttonStyle}
+                block={isMobile}
               >
                 延长会话
               </Button>
@@ -228,6 +242,8 @@ export const SessionExpiryWarning: React.FC<SessionExpiryWarningProps> = ({
               icon={<LogoutOutlined />}
               onClick={handleLogoutNow}
               data-testid="logout-now-btn"
+              style={buttonStyle}
+              block={isMobile}
             >
               立即登出
             </Button>
