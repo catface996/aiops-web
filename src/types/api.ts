@@ -95,6 +95,38 @@ export interface ForceLogoutOthersResponse {
   loggedOutCount: number
 }
 
+/**
+ * 会话信息
+ */
+export interface SessionInfo {
+  sessionId: string
+  deviceType: string // 'desktop' | 'mobile' | 'tablet'
+  browser: string
+  os: string
+  ipAddress: string
+  location?: string
+  createdAt: string
+  lastActivityAt: string
+  expiresAt: string
+  isCurrent: boolean
+}
+
+/**
+ * 会话列表响应
+ */
+export interface SessionListResponse {
+  sessions: SessionInfo[]
+  total: number
+}
+
+/**
+ * 终止会话响应
+ */
+export interface TerminateSessionResponse {
+  success: boolean
+  message: string
+}
+
 // ==================== 管理员相关 ====================
 
 /**
