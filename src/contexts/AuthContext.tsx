@@ -53,8 +53,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           // 验证 Token 有效性
           const result = await validateSession()
-          if (result.valid && result.user) {
-            setUser(result.user)
+          if (result.valid && result.userInfo) {
+            // 转换后端用户信息为前端格式
+            const user = mapBackendUserToUser(result.userInfo)
+            setUser(user)
+            userStorage.set(user)
           } else {
             // Token 无效，清除存储
             clearAuthStorage()
@@ -136,9 +139,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       const result = await validateSession()
-      if (result.valid && result.user) {
-        setUser(result.user)
-        userStorage.set(result.user)
+      if (result.valid && result.userInfo) {
+        // 转换后端用户信息为前端格式
+        const user = mapBackendUserToUser(result.userInfo)
+        setUser(user)
+        userStorage.set(user)
         return true
       } else {
         clearAuthStorage()

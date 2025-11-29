@@ -85,7 +85,11 @@ export type LogoutResponse = null
  */
 export interface ValidateSessionResponse {
   valid: boolean
-  user?: User
+  userInfo?: BackendUserInfo
+  sessionId?: string
+  expiresAt?: string
+  remainingSeconds?: number
+  message?: string
 }
 
 /**

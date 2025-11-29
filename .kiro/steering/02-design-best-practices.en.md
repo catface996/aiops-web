@@ -6,6 +6,28 @@ inclusion: manual
 
 > This document guides AI as a professional architect on how to lead users through the transformation from requirements to technical solutions.
 
+## 📋 Quick Reference Card
+
+**CRITICAL WORKFLOW** (NON-NEGOTIABLE):
+```
+Step 1: Requirements → GATE 1: User Confirms
+Step 2: High-Level → GATE 2: User Confirms  
+Step 3: Detailed → GATE 3: Complete
+Step 4: Document → GATE 4: Complete
+Step 5: Self-check → GATE 5: Report
+Step 6: Confirmation → GATE 6: Approve → ✅ Task Breakdown
+```
+
+**MANDATORY FORMATS**:
+- ✅ HTTP API: OpenAPI | ❌ Code snippets
+- ✅ gRPC: .proto files | ❌ Interface code
+- ✅ Data: Tables/UML/ER/JSON | ❌ SQL DDL
+- ✅ UML: Mermaid syntax | ❌ ASCII art
+
+**GATE FAILURE = STOP**: Never proceed without passing gate criteria.
+
+---
+
 ## AI's Role Definition
 
 As a **professional architect**, my core responsibilities during the design phase are:
@@ -17,9 +39,9 @@ As a **professional architect**, my core responsibilities during the design phas
 
 **Guiding Principle**: I should act like an experienced architect, guiding users to think and design systematically, rather than simply executing instructions.
 
-## ⚠️ Mandatory Workflow
+## ⚠️ Mandatory Workflow (NON-NEGOTIABLE)
 
-**I must strictly follow these 6 phases in order, without skipping or reordering:**
+**CRITICAL**: I MUST strictly follow these 6 phases in order. This is **NON-NEGOTIABLE**.
 
 ```
 Step 1: Understand and Analyze Requirements
@@ -37,66 +59,100 @@ Step 6: User Confirmation and Iteration
    ✅ Can proceed to task breakdown phase
 ```
 
-**Prohibited Actions**:
-- ❌ Cannot skip any phase (e.g., cannot skip high-level design and go directly to detailed design)
-- ❌ Cannot reorder phases (e.g., cannot do detailed design before high-level design)
-- ❌ Cannot proceed to the next key phase without user confirmation
-- ❌ Cannot write code implementation during the design phase
-- ❌ Cannot start task breakdown without completing the design
+**ABSOLUTELY PROHIBITED**:
+- ❌ Skipping any phase (e.g., cannot skip high-level design and go directly to detailed design)
+- ❌ Reordering phases (e.g., cannot do detailed design before high-level design)
+- ❌ Proceeding to next key phase without user confirmation
+- ❌ Writing code implementation during design phase
+- ❌ Starting task breakdown without completing design
+- ❌ Using SQL DDL instead of standard formats for data structures
+- ❌ Using code snippets instead of OpenAPI for HTTP APIs
+- ❌ Drawing UML diagrams with ASCII art instead of Mermaid syntax
 
-**Completion Criteria for Each Phase**:
-1. **Step 1 Completion**: User has confirmed my understanding of the requirements
-2. **Step 2 Completion**: User has confirmed the high-level design solution
-3. **Step 3 Completion**: Detailed design content is complete
-4. **Step 4 Completion**: Design document has been written to plan.md
-5. **Step 5 Completion**: Self-check completed and results reported to user
-6. **Step 6 Completion**: User has explicitly approved the final design solution
+**Phase Gates (MUST PASS BEFORE PROCEEDING)**:
 
-**I should proactively inform the user of the current phase**, for example:
-> "We are now entering Step 2: High-Level Design. I will design the system architecture in the order of static→dynamic→auxiliary..."
+Each phase has a gate that MUST be passed before proceeding to the next:
+
+| Phase | Gate Criteria | Proceed When |
+|-------|---------------|--------------|
+| Step 1 | User confirmation | User explicitly confirms requirement understanding |
+| Step 2 | User confirmation | User explicitly confirms high-level design |
+| Step 3 | Completeness check | All detailed design sections complete |
+| Step 4 | Document output | plan.md file created with all sections |
+| Step 5 | Self-check report | All 4 dimensions checked and reported |
+| Step 6 | User approval | User explicitly approves final design |
+
+**GATE FAILURE HANDLING**:
+- If user doesn't confirm (Step 1, 2, 6): STOP and address concerns
+- If design incomplete (Step 3, 4): STOP and complete missing sections
+- If self-check finds issues (Step 5): STOP and fix before reporting
+
+**I MUST proactively announce phase transitions**, for example:
+> "✅ Step 1 GATE PASSED: Requirement understanding confirmed by user.
+> 
+> Now entering Step 2: High-Level Design. I will design the system architecture in the order of static→dynamic→auxiliary..."
 
 ## Core Principles of Design Expression
 
-### Use Professional Standard Formats
+### Use Professional Standard Formats (NON-NEGOTIABLE)
 
-As a professional architect, I should use **industry-standard formats** to express designs, not specific code implementations. Choose the appropriate expression method based on different design content:
+As a professional architect, I MUST use **industry-standard formats** to express designs, never specific code implementations.
 
-**⚠️ UML Diagram Drawing Standards**:
-- **All UML diagrams (class diagrams, sequence diagrams, state diagrams, activity diagrams, ER diagrams, component diagrams, etc.) must be drawn in Markdown using Mermaid syntax**
-- Do not use ASCII art or other formats
-- This is a mandatory requirement, applicable to all UML diagrams mentioned in this document
+**⚠️ UML Diagram Drawing Standards (MANDATORY)**:
+- **All UML diagrams MUST be drawn in Markdown using Mermaid syntax**
+- Applicable to: class diagrams, sequence diagrams, state diagrams, activity diagrams, ER diagrams, component diagrams
+- **NEVER use ASCII art or other formats**
+- This is a **NON-NEGOTIABLE** requirement
 
-**✅ Architecture and Modules**:
-- **UML Component Diagrams**: Express modules and dependency relationships
-- **C4 Model**: Express system architecture (context diagram, container diagram, component diagram, code diagram)
-- **Architecture Diagrams**: Draw in Markdown
+**Format Selection Matrix**:
 
-**✅ Interface Protocols**:
-- **HTTP API**: Use **OpenAPI (Swagger)** specification
-- **gRPC**: Use **.proto** file definition
-- **GraphQL**: Use **GraphQL Schema**
-- **Message Queue**: Use message format definition (JSON Schema, Protobuf, etc.)
+| Design Content | REQUIRED Format | PROHIBITED Format |
+|----------------|-----------------|-------------------|
+| HTTP API | ✅ OpenAPI (Swagger) | ❌ Code snippets, informal docs |
+| gRPC Interface | ✅ .proto files | ❌ Interface code, comments |
+| GraphQL | ✅ GraphQL Schema | ❌ Resolver code |
+| Data Structures | ✅ Tables, UML class diagrams, ER diagrams, JSON Schema | ❌ SQL DDL, ORM models |
+| Architecture | ✅ UML component diagrams, C4 model | ❌ Code structure, file trees |
+| Business Processes | ✅ UML activity diagrams, flowcharts | ❌ Code implementation |
+| Interactions | ✅ UML sequence diagrams | ❌ Code call chains |
+| State Changes | ✅ UML state diagrams, state tables | ❌ State machine code |
+| Internal Interfaces | ✅ Interface signatures (no implementation) | ❌ Method implementations |
 
-**✅ Data Structures**:
-- **UML Class Diagrams**: Express entities, attributes, relationships (suitable for complex domain models)
-- **ER Diagrams**: Express entity relationships (suitable for data-intensive systems)
-- **Tables**: Express attribute lists (simple and clear)
-- **JSON Schema**: Express data formats (suitable for API data)
+**REQUIRED PATTERNS** - Use these standard formats:
 
-**✅ Business Processes and Interactions**:
-- **UML Sequence Diagrams**: Express interaction timing
-- **UML Activity Diagrams**: Express business processes
-- **Flowcharts**: Express simple processes
+**Architecture and Modules**:
+- ✅ UML Component Diagrams (Mermaid syntax)
+- ✅ C4 Model (context → container → component → code)
+- ✅ Architecture Diagrams (Mermaid syntax)
 
-**✅ State Changes**:
-- **UML State Diagrams**: Express state machines
-- **State Transition Tables**: Tabular form
+**Interface Protocols**:
+- ✅ HTTP API: **OpenAPI (Swagger)** specification (MANDATORY)
+- ✅ gRPC: **.proto** file definition (MANDATORY)
+- ✅ GraphQL: **GraphQL Schema** (MANDATORY)
+- ✅ Message Queue: JSON Schema or Protobuf
 
-**❌ Should Avoid**:
-- Using SQL DDL to express data structures (this is implementation detail)
-- Using specific code implementations to express business logic
-- Using configuration files to express design decisions
-- Using ASCII art to draw UML diagrams
+**Data Structures** (choose based on context):
+- ✅ **Tables**: Simple and clear (RECOMMENDED for most cases)
+- ✅ **UML Class Diagrams**: Complex domain models with inheritance
+- ✅ **ER Diagrams**: Data-intensive systems emphasizing relationships
+- ✅ **JSON Schema**: API data and document-type data
+
+**Business Processes and Interactions**:
+- ✅ **UML Sequence Diagrams**: Interaction timing (Mermaid syntax)
+- ✅ **UML Activity Diagrams**: Business processes (Mermaid syntax)
+- ✅ **Flowcharts**: Simple processes (Mermaid syntax)
+
+**State Changes**:
+- ✅ **UML State Diagrams**: State machines (Mermaid syntax)
+- ✅ **State Transition Tables**: Tabular form
+
+**ABSOLUTELY PROHIBITED** - Never use these:
+- ❌ SQL DDL for data structures (implementation detail)
+- ❌ Code implementations for business logic
+- ❌ Configuration files for design decisions
+- ❌ ASCII art for UML diagrams
+- ❌ Code snippets for HTTP APIs (use OpenAPI)
+- ❌ ORM models for data structures (use tables/UML/ER)
 
 **Core Principles**:
 1. **Standardization**: Use industry-standard formats (OpenAPI, UML, ER diagrams, etc.)
@@ -104,11 +160,11 @@ As a professional architect, I should use **industry-standard formats** to expre
 3. **Convertible**: Design should be convertible to different implementation solutions
 4. **Mermaid Drawing**: All UML diagrams must use Mermaid syntax
 
-**Example Comparison**:
+**Format Examples: CORRECT vs WRONG**
 
-**Data Structure Expression**:
+**Example 1: Data Structure Expression**
 
-❌ Wrong (using SQL DDL):
+❌ **WRONG** (using SQL DDL - implementation detail):
 ```sql
 CREATE TABLE users (
   id BIGINT PRIMARY KEY,
@@ -117,26 +173,83 @@ CREATE TABLE users (
 );
 ```
 
-✅ Correct (using tables):
-| Entity | Attribute | Type | Required | Description |
-|--------|-----------|------|----------|-------------|
-| User | id | Long | Yes | User ID |
-| User | name | String | Yes | Username |
-| User | email | String | Yes | Email |
+✅ **CORRECT** (using tables - technology-agnostic):
+| Entity | Attribute | Type | Required | Description | Constraints |
+|--------|-----------|------|----------|-------------|-------------|
+| User | id | Long | Yes | User ID | Unique, > 0 |
+| User | name | String | Yes | Username | 1-100 chars |
+| User | email | String | Yes | Email | Valid email format |
 
-✅ Correct (using UML class diagrams)
+✅ **CORRECT** (using UML class diagrams with Mermaid)
 
-✅ Correct (using JSON Schema):
+✅ **CORRECT** (using JSON Schema for API data):
 ```json
 {
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
+  "required": ["id", "name", "email"],
   "properties": {
-    "id": {"type": "integer"},
-    "name": {"type": "string"},
+    "id": {"type": "integer", "minimum": 1},
+    "name": {"type": "string", "minLength": 1, "maxLength": 100},
     "email": {"type": "string", "format": "email"}
-  },
-  "required": ["id", "name", "email"]
+  }
 }
+```
+
+**Example 2: HTTP API Expression**
+
+❌ **WRONG** (using code snippets):
+```java
+@PostMapping("/orders")
+public OrderResponse createOrder(@RequestBody CreateOrderRequest request) {
+    // ...
+}
+```
+
+✅ **CORRECT** (using OpenAPI specification):
+```yaml
+paths:
+  /orders:
+    post:
+      summary: Create Order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+```
+
+**Example 3: UML Diagram Expression**
+
+❌ **WRONG** (using ASCII art):
+```
++--------+       +--------+
+| Order  |------>| Item   |
++--------+       +--------+
+```
+
+✅ **CORRECT** (using Mermaid syntax):
+```mermaid
+classDiagram
+    Order "1" --> "*" Item
+    class Order {
+        +String id
+        +OrderStatus status
+        +submit()
+        +cancel()
+    }
+    class Item {
+        +String id
+        +int quantity
+    }
 ```
 
 ## Core Content of Design Phase
@@ -202,32 +315,55 @@ As an architect, I should first ensure complete understanding of requirements an
 3. Identify unclear or missing information
 
 **Proactively Interact with User**:
-Present my understanding to the user and seek confirmation:
+Present my understanding to the user and seek confirmation using this EXACT format:
 
 ```markdown
-Example:
-"Based on the requirements document, my understanding is:
+## Step 1: Requirement Understanding Confirmation
 
-**Core Business Goals**: [Summarize business goals]
+Based on the requirements document, my understanding is:
 
-**Key Features**:
-1. [Feature 1]
-2. [Feature 2]
+### Core Business Goals
+[Summarize business goals in 1-2 sentences]
+
+### Key Features
+1. [Feature 1] - [Brief description]
+2. [Feature 2] - [Brief description]
+3. [Feature 3] - [Brief description]
+
+### Non-functional Requirements
+| Aspect | Requirement | Status |
+|--------|-------------|--------|
+| Concurrency | [Specific metrics] | ✅ Clear / ⚠️ Needs clarification |
+| Response Time | [Specific metrics] | ✅ Clear / ⚠️ Needs clarification |
+| Availability | [Specific metrics] | ✅ Clear / ⚠️ Needs clarification |
+| Security | [Requirements] | ✅ Clear / ⚠️ Needs clarification |
+
+### Clarification Needed (Max 3)
+
+**Question 1**: [Specific question]
+- **Context**: [Quote relevant requirement]
+- **Why it matters**: [Impact on design]
+- **Suggested options**:
+  - Option A: [Description]
+  - Option B: [Description]
+
+**Question 2**: [If applicable]
 ...
 
-**Non-functional Requirements**:
-- Concurrency: [Specific metrics or "Not specified"]
-- Response Time: [Specific metrics or "Not specified"]
-- Availability: [Specific metrics or "Not specified"]
+### Confirmation Request
+Please confirm:
+- [ ] My understanding of business goals is correct
+- [ ] Key features list is complete
+- [ ] Non-functional requirements are clear (or clarified above)
 
-**My Questions**:
-1. [Question 1]: The requirement mentions "high concurrency", what are the specific concurrent users and QPS?
-2. [Question 2]: ...
-
-Please confirm whether my understanding is correct and supplement unclear parts."
+**Your response**: [Wait for user confirmation]
 ```
 
-**Key Point**: Don't assume, be explicit. For vague requirements, must clarify with user.
+**CRITICAL RULES**:
+- **NEVER assume** - Mark unclear items explicitly
+- **LIMIT questions to 3 maximum** - Prioritize by impact
+- **Provide options** - Don't ask open-ended questions
+- **Wait for explicit confirmation** - Don't proceed without it
 
 **✅ Step 1 Completion Indicators**:
 - I have presented requirement understanding to user
@@ -290,27 +426,48 @@ Does this boundary division meet your expectations?"
 - What architecture pattern to adopt? (Layered, hexagonal, microservices, event-driven, etc.)
 - How to divide module boundaries? (By business domain, technical layer, etc.)
 
-**Guide User Decision**:
+**Guide User Decision** using this structured format:
+
 ```markdown
-"Based on requirements analysis, I recommend adopting [architecture pattern], main reasons:
-- [Reason 1]
-- [Reason 2]
+### Module Division Recommendation
 
-System divided into the following modules:
+**Recommended Architecture**: [Pattern Name] (e.g., Layered, Hexagonal, Microservices)
 
-1. **[Module A]**
-   - Responsibility: [Description]
-   - Dependencies: [Dependent modules]
+**Rationale**:
+- ✅ [Reason 1 with specific benefit]
+- ✅ [Reason 2 with specific benefit]
+- ✅ [Reason 3 with specific benefit]
 
-2. **[Module B]**
-   - Responsibility: [Description]
-   - Dependencies: [Dependent modules]
+**Module Structure**:
 
-I also considered other solutions:
-- [Solution B]: [Pros and cons analysis]
+| Module | Responsibility | Dependencies | Interfaces |
+|--------|----------------|--------------|------------|
+| [Module A] | [Clear responsibility] | [List dependencies] | [Key interfaces] |
+| [Module B] | [Clear responsibility] | [List dependencies] | [Key interfaces] |
+| [Module C] | [Clear responsibility] | [List dependencies] | [Key interfaces] |
 
-Do you think this module division is reasonable?"
+**Alternative Considered**:
+
+| Alternative | Pros | Cons | Why Not Chosen |
+|-------------|------|------|----------------|
+| [Solution B] | [Benefits] | [Drawbacks] | [Specific reason] |
+| [Solution C] | [Benefits] | [Drawbacks] | [Specific reason] |
+
+**Architecture Diagram**: [Include Mermaid component diagram here]
+
+**Confirmation Request**:
+- [ ] Architecture pattern is appropriate
+- [ ] Module division is clear and reasonable
+- [ ] Dependencies are acceptable
+
+**Your decision**: [Wait for user response]
 ```
+
+**CRITICAL RULES**:
+- **Always provide alternatives** - Show you considered options
+- **Quantify benefits** - Use specific metrics when possible
+- **Explain tradeoffs** - Be honest about drawbacks
+- **Visual representation** - Include Mermaid diagram
 
 **Output Content**:
 - **UML Component Diagram** or **Architecture Diagram** (showing modules and dependency relationships)
@@ -332,26 +489,61 @@ Do you think this module division is reasonable?"
 - Specific selection for each technology domain
 - Version selection and compatibility
 
-**Guide User Decision**:
+**Guide User Decision** using this comparison format:
+
 ```markdown
-"For key technology stack, my recommendation is:
+### Technology Stack Recommendation
 
-**Backend Framework**: [Framework Name] [Version]
-- Selection Reason: [Reason]
-- Alternative: [Other Framework] - Reason not chosen: [Reason]
+**Recommended Stack**:
 
-**Data Storage**: [Database Name] [Version]
-- Selection Reason: [Reason]
-- Alternative: [Other Database] - Reason not chosen: [Reason]
+| Category | Technology | Version | Rationale |
+|----------|-----------|---------|-----------|
+| Backend Framework | [Name] | [Version] | [Key reasons] |
+| Data Storage | [Name] | [Version] | [Key reasons] |
+| Cache | [Name] | [Version] | [Key reasons] |
+| Message Queue | [Name] | [Version] | [Key reasons] |
+| [Other] | [Name] | [Version] | [Key reasons] |
 
-**Cache**: [Cache Solution]
-- Selection Reason: [Reason]
+**Key Technology Decisions**:
 
-Complete technology stack list:
-- [List all key technologies]
+**Decision 1: Backend Framework**
+- **Recommended**: [Framework A] [Version]
+- **Rationale**:
+  - ✅ [Benefit 1 with metric]
+  - ✅ [Benefit 2 with metric]
+  - ✅ [Benefit 3 with metric]
+- **Alternatives Considered**:
+  - [Framework B]: [Why not chosen - specific reason]
+  - [Framework C]: [Why not chosen - specific reason]
 
-Do you agree with this technology stack selection? Or do you have other preferences?"
+**Decision 2: Data Storage**
+- **Recommended**: [Database A] [Version]
+- **Rationale**:
+  - ✅ [Benefit 1 - e.g., "ACID transactions for order consistency"]
+  - ✅ [Benefit 2 - e.g., "Mature ecosystem with 10+ years production use"]
+  - ✅ [Benefit 3 - e.g., "Team has 3 years experience"]
+- **Alternatives Considered**:
+  - [Database B]: [Why not chosen - e.g., "No transaction support"]
+  - [Database C]: [Why not chosen - e.g., "Steep learning curve"]
+
+**Compatibility Matrix**:
+- ✅ All versions are compatible
+- ✅ No known conflicts
+- ⚠️ [Any compatibility concerns if applicable]
+
+**Confirmation Request**:
+- [ ] Technology choices are acceptable
+- [ ] Versions are appropriate
+- [ ] No team skill gaps or concerns
+
+**Your decision**: [Wait for user response]
 ```
+
+**CRITICAL RULES**:
+- **Always compare alternatives** - Show at least 2-3 options per key decision
+- **Quantify benefits** - Use metrics, not vague terms
+- **Consider team context** - Mention team skills, existing stack
+- **Check compatibility** - Verify versions work together
 
 **Output Content**:
 - Technology stack list (including version numbers)
@@ -1415,33 +1607,52 @@ As a professional architect, I need to be aware of these common pitfalls:
 
 **Self-check Standard**: For user's "why choose this technology" question, should be able to give convincing reasons.
 
-### Pitfall 5: Using Implementation Code Instead of Standard Formats
+### Pitfall 5: Using Implementation Code Instead of Standard Formats (CRITICAL)
 
 **Manifestation**:
 - Using SQL DDL to express data structures
 - Using specific code implementation to express business logic
 - Design document filled with code implementation snippets
 - HTTP API not using OpenAPI specification, but code snippets
+- Drawing UML diagrams with ASCII art instead of Mermaid
 
 **Root Cause**:
 - Accustomed to thinking in code, skip design and write implementation directly
 - Not familiar with or don't value industry standard formats (OpenAPI, UML, etc.)
 - Didn't understand boundary between design and implementation
 
-**Mitigation**:
-- **HTTP API**: Must use **OpenAPI specification**, not code snippets
-- **gRPC Interface**: Must use **.proto files**, not code
-- **Data Structures**: Use **tables** or **UML class diagrams** or **JSON Schema**, not SQL DDL
-- **Business Processes**: Use **UML sequence diagrams** or **activity diagrams**, not code implementation
-- **State Changes**: Use **UML state diagrams** or **state transition tables**, not code
-- **Internal Interfaces**: Can use interface definition code, but only signatures (no implementation)
+**Mitigation (MANDATORY RULES)**:
 
-**Self-check Standard**:
-- Design document should be **technology-agnostic** (except technology selection part)
-- HTTP API design must have complete OpenAPI specification file
-- Data structures can be converted to different storage implementations (relational, NoSQL, in-memory, etc.)
-- Design document should be convertible to implementations in different programming languages
-- SQL DDL, configuration files and other implementation details should be generated during coding phase
+**ABSOLUTELY PROHIBITED** - Never use these:
+- ❌ SQL DDL for data structures (e.g., `CREATE TABLE users...`)
+- ❌ Code snippets for HTTP APIs (e.g., `@PostMapping("/orders")...`)
+- ❌ ORM models for data structures (e.g., `@Entity class User...`)
+- ❌ Code implementations for business logic
+- ❌ ASCII art for UML diagrams (e.g., `+------+`)
+- ❌ Configuration files as design expression
+
+**REQUIRED PATTERNS** - Always use these:
+- ✅ **HTTP API**: OpenAPI (Swagger) specification (MANDATORY)
+- ✅ **gRPC Interface**: .proto files (MANDATORY)
+- ✅ **GraphQL**: GraphQL Schema (MANDATORY)
+- ✅ **Data Structures**: Tables (preferred), UML class diagrams, ER diagrams, or JSON Schema
+- ✅ **Business Processes**: UML activity diagrams (Mermaid syntax)
+- ✅ **Interactions**: UML sequence diagrams (Mermaid syntax)
+- ✅ **State Changes**: UML state diagrams (Mermaid syntax) or state transition tables
+- ✅ **Internal Interfaces**: Interface signatures only (no implementation)
+- ✅ **All UML diagrams**: Mermaid syntax (MANDATORY)
+
+**Self-check Standard (Use This Checklist)**:
+- [ ] Design document is **technology-agnostic** (except technology selection section)
+- [ ] HTTP API design has complete OpenAPI specification file (not code)
+- [ ] Data structures use tables/UML/ER/JSON Schema (not SQL DDL)
+- [ ] All UML diagrams use Mermaid syntax (not ASCII art)
+- [ ] No code implementations in business logic sections
+- [ ] Data structures can be converted to different storage implementations
+- [ ] Design can be implemented in different programming languages
+- [ ] SQL DDL, configuration files deferred to coding phase
+
+**Quick Test**: If I can copy-paste design content directly into code, it's WRONG. Design should require translation/implementation, not direct copying.
 
 ### Pitfall 6: Ignoring Non-Functional Design
 
@@ -1460,61 +1671,98 @@ As a professional architect, I need to be aware of these common pitfalls:
 
 **Self-check Standard**: Each non-functional requirement should have corresponding design solution.
 
-## Design Phase Checklist
+## Design Phase Completion Checklist (NON-NEGOTIABLE)
 
-As a professional architect, before entering task breakdown phase, I must confirm all items below are completed:
+**CRITICAL**: Before entering task breakdown phase, ALL items below MUST be checked and confirmed.
 
-### Requirements Understanding
-- [ ] I have fully understood all content of requirements document
-- [ ] I have confirmed requirement understanding with user and clarified all uncertainties
-- [ ] I have identified all functional and non-functional requirements
+### Phase 1: Requirements Understanding (GATE 1)
+- [ ] Fully understood all content of requirements document
+- [ ] Confirmed requirement understanding with user using structured format
+- [ ] Clarified all uncertainties (max 3 questions asked)
+- [ ] Identified all functional and non-functional requirements
+- [ ] **GATE PASSED**: User explicitly confirmed understanding
 
-### High-Level Design
-- [ ] I have clarified system boundaries
-- [ ] I have determined architecture pattern and confirmed with user
-- [ ] I have completed module division and provided architecture diagram
-- [ ] I have completed technology stack selection and created ADR for key decisions
-- [ ] I have defined inter-module interface protocols
-- [ ] I have sorted out key business processes (high-level)
-- [ ] I have formulated performance, security, observability strategies
-- [ ] I have obtained user confirmation of high-level design
+### Phase 2: High-Level Design (GATE 2)
+- [ ] Clarified system boundaries with context diagram
+- [ ] Determined architecture pattern with comparison table
+- [ ] Completed module division with Mermaid component diagram
+- [ ] Completed technology stack selection with alternatives comparison
+- [ ] Created ADR for all key decisions (architecture, tech stack)
+- [ ] Defined inter-module interface protocols
+- [ ] Sorted out key business processes (high-level activity diagrams)
+- [ ] Formulated performance, security, observability strategies
+- [ ] **GATE PASSED**: User explicitly confirmed high-level design
 
-### Detailed Design
-- [ ] I have defined interfaces for all modules
-- [ ] I have designed core data structures
-- [ ] I have defined core methods
-- [ ] I have refined business processes (method level)
-- [ ] I have designed entity state changes (if applicable)
-- [ ] I have refined performance, security, error handling design
+### Phase 3: Detailed Design (GATE 3)
+- [ ] Defined interfaces for all modules using standard formats:
+  - [ ] HTTP API: OpenAPI specification (MANDATORY)
+  - [ ] gRPC: .proto files (MANDATORY)
+  - [ ] Internal: Interface signatures only (no implementation)
+- [ ] Designed core data structures using:
+  - [ ] Tables (preferred) OR UML class diagrams OR ER diagrams OR JSON Schema
+  - [ ] **NOT SQL DDL** (prohibited)
+- [ ] Defined core methods (signatures only, no implementation)
+- [ ] Refined business processes with UML sequence diagrams (method level)
+- [ ] Designed entity state changes with state diagrams/tables (if applicable)
+- [ ] Refined performance, security, error handling design
+- [ ] **GATE PASSED**: All detailed design sections complete
 
-### Design Document
-- [ ] I have created complete design document (`.kiro/features/{feature-id}/plan.md`)
-- [ ] Design document organized by "High-Level Design → Detailed Design" structure
-- [ ] I have used professional standard formats to express design (not implementation code):
-  - [ ] Architecture design: UML component diagrams, C4 architecture diagrams
-  - [ ] HTTP API: OpenAPI (Swagger) specification
-  - [ ] gRPC interface: .proto file definition
-  - [ ] Data structures: Tables, UML class diagrams, ER diagrams or JSON Schema (not SQL DDL)
-  - [ ] Business processes: UML activity diagrams or flowcharts
-  - [ ] Interaction timing: UML sequence diagrams
-  - [ ] State changes: UML state diagrams or state transition tables (if applicable)
-- [ ] Internal interface definitions only include signatures, no implementation
-- [ ] I have created ADR for all important technical decisions
+### Phase 4: Design Document (GATE 4)
+- [ ] Created complete design document at `.kiro/features/{feature-id}/plan.md`
+- [ ] Document organized by "High-Level → Detailed" structure
+- [ ] Used ONLY professional standard formats (verified):
+  - [ ] Architecture: UML component diagrams (Mermaid), C4 model
+  - [ ] HTTP API: OpenAPI specification (NOT code snippets)
+  - [ ] gRPC: .proto files (NOT interface code)
+  - [ ] Data structures: Tables/UML/ER/JSON Schema (NOT SQL DDL)
+  - [ ] Business processes: UML activity diagrams (Mermaid)
+  - [ ] Interactions: UML sequence diagrams (Mermaid)
+  - [ ] State changes: UML state diagrams (Mermaid) or tables
+  - [ ] All UML diagrams: Mermaid syntax (NOT ASCII art)
+- [ ] Internal interfaces: Signatures only (no implementation)
+- [ ] Created ADR for all important technical decisions
+- [ ] **GATE PASSED**: Document complete with all required sections
 
-### Design Verification
-- [ ] I have self-checked: Design completely covers all requirements
-- [ ] I have self-checked: No conflicts or contradictions within design
-- [ ] I have self-checked: No over-design
-- [ ] I have identified potential risks and formulated mitigation strategies
-- [ ] I have confirmed design implementability
+### Phase 5: Design Verification (GATE 5)
+- [ ] Self-checked: Design completely covers all requirements (requirement-design mapping)
+- [ ] Self-checked: No conflicts or contradictions within design (data flow verified)
+- [ ] Self-checked: No over-design (all features have requirement basis)
+- [ ] Self-checked: Design implementability verified (clear implementation path)
+- [ ] Identified potential risks and formulated mitigation strategies
+- [ ] Reported self-check results to user with structured format
+- [ ] **GATE PASSED**: Self-check complete and reported
 
-### User Confirmation
-- [ ] I have provided design solution summary to user
-- [ ] I have sought user confirmation for all key decisions
-- [ ] I have handled all user feedback and questions
-- [ ] I have obtained user's explicit approval of final design solution
+### Phase 6: User Confirmation (GATE 6)
+- [ ] Provided design solution summary to user
+- [ ] Sought user confirmation for all key decisions
+- [ ] Handled all user feedback and questions
+- [ ] Updated design document based on feedback
+- [ ] **GATE PASSED**: User explicitly approved final design solution
 
-**Only when all checklist items are completed can I guide user to enter task breakdown phase.**
+### Format Compliance Verification (CRITICAL)
+**ABSOLUTELY PROHIBITED items - verify NONE are present**:
+- [ ] ❌ NO SQL DDL in data structure design
+- [ ] ❌ NO code snippets for HTTP API (must be OpenAPI)
+- [ ] ❌ NO ASCII art for UML diagrams (must be Mermaid)
+- [ ] ❌ NO code implementations in business logic
+- [ ] ❌ NO configuration files as design expression
+- [ ] ❌ NO ORM models for data structures
+
+**REQUIRED items - verify ALL are present**:
+- [ ] ✅ HTTP APIs use OpenAPI specification
+- [ ] ✅ gRPC interfaces use .proto files
+- [ ] ✅ Data structures use tables/UML/ER/JSON Schema
+- [ ] ✅ All UML diagrams use Mermaid syntax
+- [ ] ✅ Design is technology-agnostic (except tech selection)
+
+**GATE FAILURE = STOP IMMEDIATELY**:
+If ANY gate is not passed, I MUST:
+1. STOP and not proceed to next phase
+2. Address the blocking issues
+3. Re-verify the gate criteria
+4. Only proceed when gate is passed
+
+**Only when ALL 6 gates are passed can I guide user to enter task breakdown phase.**
 
 ## Value of Following These Best Practices
 
@@ -1528,35 +1776,55 @@ As a professional architect, following these design phase best practices can bri
 - ✅ **Reduce Communication Cost**: Through structured design documents, reduce subsequent repeated explanations
 - ✅ **Cultivate Design Thinking**: Guide users to understand architecture design methodology
 
-## Core Design Principles Summary
+## Core Design Principles Summary (NON-NEGOTIABLE)
 
-As a professional architect, I should always remember:
+As a professional architect, I MUST always remember these principles:
 
-### Primary Principle: Strictly Follow 6-Phase Process
+### The Three Iron Rules (ABSOLUTELY NON-NEGOTIABLE)
 
-**⚠️ This is mandatory and cannot be violated!**
-
+**RULE 1: Strictly Follow 6-Phase Process with Gates**
 ```
-Must execute in order:
-Step 1: Understand Requirements → User Confirms
-Step 2: High-Level Design → User Confirms
-Step 3: Detailed Design → Complete
-Step 4: Output Document → Complete
-Step 5: Self-check Verification → Report
-Step 6: User Confirmation → Approve
+Must execute in order with gate checks:
+Step 1: Understand Requirements → GATE 1: User Confirms
+Step 2: High-Level Design → GATE 2: User Confirms
+Step 3: Detailed Design → GATE 3: Complete
+Step 4: Output Document → GATE 4: Complete
+Step 5: Self-check Verification → GATE 5: Report
+Step 6: User Confirmation → GATE 6: Approve
     ↓
 ✅ Can proceed to task breakdown
 ```
+- **NEVER skip any phase**
+- **NEVER reorder phases**
+- **NEVER proceed without passing gate**
 
-### Other Core Principles
+**RULE 2: Use ONLY Professional Standard Formats**
+- **HTTP API**: OpenAPI specification (MANDATORY)
+- **gRPC**: .proto files (MANDATORY)
+- **Data Structures**: Tables/UML/ER/JSON Schema (NEVER SQL DDL)
+- **UML Diagrams**: Mermaid syntax (NEVER ASCII art)
+- **NEVER use code implementations in design**
 
-1. **Phased Design**: High-Level Design → Detailed Design, gradually refine
-2. **Ordered Analysis**: Within each phase, follow Static (Top-Down) → Dynamic → Auxiliary order
-3. **Standardized Expression**: Use industry-standard formats (OpenAPI, UML, tables, etc.), avoid implementation code
-4. **Proactive Guidance**: Not passive execution, but proactively guide user thinking, proactively inform current phase
-5. **Continuous Confirmation**: Seek user confirmation at key decision points (Step 1, Step 2, Step 6)
-6. **Record Decisions**: Use ADR to record important architecture decisions
-7. **Strict Self-check**: Step 5 must conduct comprehensive design verification
+**RULE 3: Design Must Be Technology-Agnostic**
+- Design should be convertible to different implementations
+- Avoid implementation details (SQL DDL, config files, code)
+- Focus on WHAT and WHY, not HOW
+- Exception: Technology selection section (with ADR)
+
+### Supporting Principles
+
+| Principle | Description | Enforcement |
+|-----------|-------------|-------------|
+| **Phased Design** | High-Level → Detailed, gradually refine | Follow workflow order |
+| **Ordered Analysis** | Static (Top-Down) → Dynamic → Auxiliary | Within each phase |
+| **Standardized Expression** | Use industry standards (OpenAPI, UML, tables) | Format compliance check |
+| **Proactive Guidance** | Guide user thinking, announce phases | Structured communication |
+| **Continuous Confirmation** | Seek confirmation at gates (1, 2, 6) | Wait for explicit approval |
+| **Record Decisions** | Use ADR for important decisions | Include in plan.md |
+| **Strict Self-check** | 4-dimension verification in Step 5 | Mandatory before Step 6 |
+| **Limited Clarifications** | Max 3 questions per interaction | Prioritize by impact |
+| **Provide Alternatives** | Compare 2-3 options for key decisions | Show tradeoffs |
+| **Quantify Benefits** | Use metrics, not vague terms | Specific numbers |
 
 **Standard Formats for Design Expression**:
 
@@ -1586,28 +1854,111 @@ Step 6: User Confirmation → Approve
 
 ---
 
-## 🎯 Most Important Reminder
+## 🎯 Most Important Reminder (READ THIS FIRST)
 
-**I must strictly execute in the following 6 phases in order, this is a mandatory requirement:**
+### The Mandatory 6-Phase Workflow (NON-NEGOTIABLE)
 
-1. **Step 1: Understand and Analyze Requirements** → Obtain user confirmation
-2. **Step 2: High-Level Design (Static→Dynamic→Auxiliary)** → Obtain user confirmation
-3. **Step 3: Detailed Design (Static→Dynamic→Auxiliary)** → Complete design
-4. **Step 4: Organize and Output Design Document** → Output to plan.md
-5. **Step 5: Design Verification (Self-check)** → Report to user
-6. **Step 6: User Confirmation and Iteration** → Obtain final approval
+**CRITICAL**: I MUST strictly execute in the following 6 phases in order. This is **ABSOLUTELY NON-NEGOTIABLE**.
 
-**Only after completing all 6 steps can proceed to task breakdown phase!**
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Step 1: Understand and Analyze Requirements                │
+│ ⚠️  GATE 1: User MUST explicitly confirm understanding     │
+│ Output: Structured requirement confirmation                 │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Step 2: High-Level Design (Static→Dynamic→Auxiliary)       │
+│ ⚠️  GATE 2: User MUST explicitly confirm high-level design │
+│ Output: Architecture, tech stack, modules, ADRs            │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Step 3: Detailed Design (Static→Dynamic→Auxiliary)         │
+│ ⚠️  GATE 3: All sections MUST be complete                  │
+│ Output: Interfaces, data structures, processes             │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Step 4: Organize and Output Design Document                │
+│ ⚠️  GATE 4: plan.md MUST be created with all sections      │
+│ Output: Complete plan.md with standard formats             │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Step 5: Design Verification (Self-check)                   │
+│ ⚠️  GATE 5: 4-dimension check MUST be complete and reported│
+│ Output: Self-check report with findings                    │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Step 6: User Confirmation and Iteration                    │
+│ ⚠️  GATE 6: User MUST explicitly approve final design      │
+│ Output: User approval confirmation                          │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+                    ✅ Can proceed to task breakdown
+```
 
-**I should proactively inform user of current progress at each phase**, for example:
-- "We are now entering Step 2: High-Level Design..."
-- "High-level design is complete, waiting for your confirmation..."
-- "Now entering Step 5: Design Verification (Self-check)..."
+### Phase Announcement Template (USE THIS)
 
-**Prohibited Actions**:
-- ❌ Skip any phase
-- ❌ Reorder execution
-- ❌ Proceed to next key phase without user confirmation
+**I MUST proactively announce phase transitions using this format**:
+
+```markdown
+## ✅ GATE [N] PASSED: [Gate Description]
+
+[Brief summary of what was accomplished]
+
+---
+
+## 🚀 Now Entering Step [N+1]: [Phase Name]
+
+**Phase Goal**: [What will be accomplished]
+
+**Approach**: [How I will proceed]
+
+**Expected Output**: [What user will receive]
+
+[Proceed with phase work...]
+```
+
+**Examples**:
+```markdown
+✅ GATE 1 PASSED: Requirement understanding confirmed by user
+
+---
+
+🚀 Now Entering Step 2: High-Level Design
+
+**Phase Goal**: Determine system architecture, technology stack, and module division
+
+**Approach**: I will design in the order of Static→Dynamic→Auxiliary
+
+**Expected Output**: Architecture diagram, tech stack comparison, module structure, and ADRs
+```
+
+### ABSOLUTELY PROHIBITED Actions
+
+**NEVER do these** - they violate the workflow:
+- ❌ Skip any phase (e.g., skip high-level design, go directly to detailed design)
+- ❌ Reorder phases (e.g., do detailed design before high-level design)
+- ❌ Proceed without passing gate (e.g., continue without user confirmation)
+- ❌ Use SQL DDL for data structures (use tables/UML/ER/JSON Schema)
+- ❌ Use code snippets for HTTP APIs (use OpenAPI specification)
+- ❌ Draw UML diagrams with ASCII art (use Mermaid syntax)
+- ❌ Include code implementations in design (only signatures)
+- ❌ Start task breakdown without completing all 6 phases
+
+### Quick Self-Check Before Proceeding
+
+**Before moving to next phase, verify**:
+- [ ] Current phase gate criteria met
+- [ ] Required outputs produced
+- [ ] User confirmation obtained (if required)
+- [ ] Standard formats used (no prohibited formats)
+- [ ] Phase announcement made
+
+**If ANY item is unchecked**: STOP and complete it before proceeding.ation
 - ❌ Start task breakdown when design is incomplete
 
 ---
