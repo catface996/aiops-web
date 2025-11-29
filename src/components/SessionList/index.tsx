@@ -1,10 +1,11 @@
 /**
  * 会话列表组件
  * 任务 24: 实现会话列表基础组件
- * 需求: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9
+ * 任务 27: 实现会话列表响应式布局
+ * 需求: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 10.1, 10.2, 10.3
  */
 import React, { useState, useEffect, useCallback } from 'react'
-import { Table, Card, Tag, Button, Space, Spin, Empty, message, Modal, Typography } from 'antd'
+import { Table, Card, Tag, Button, Space, Spin, Empty, message, Modal, Typography, Grid, List } from 'antd'
 import {
   DesktopOutlined,
   MobileOutlined,
@@ -20,6 +21,7 @@ import type { SessionInfo } from '@/types'
 import { getSessionList, terminateSession, terminateOtherSessions } from '@/services/session'
 
 const { Text, Title } = Typography
+const { useBreakpoint } = Grid
 
 /**
  * 格式化相对时间
@@ -89,6 +91,10 @@ export const SessionList: React.FC<SessionListProps> = ({ currentSessionId: _cur
   const [loading, setLoading] = useState(false)
   const [terminatingId, setTerminatingId] = useState<string | null>(null)
   const [terminatingOthers, setTerminatingOthers] = useState(false)
+  const screens = useBreakpoint()
+
+  // 移动端使用卡片布局，平板及以上使用表格
+  const isMobile = !screens.md
 
   // 加载会话列表
   const loadSessions = useCallback(async () => {
@@ -246,10 +252,75 @@ export const SessionList: React.FC<SessionListProps> = ({ currentSessionId: _cur
 
   const otherSessionsCount = sessions.filter((s) => !s.isCurrent).length
 
+  // 移动端卡片渲染
+  const renderMobileCard = (session: SessionInfo) => (
+    <Card
+      size="small"
+      style={{ marginBottom: 12 }}
+      data-testid={`session-card-${session.sessionId}`}
+    >
+      <Space direction="vertical" style={{ width: '100%' }}>
+        {/* 设备信息行 */}
+        <Space style={{ justifyContent: 'space-between', width: '100%' }}>
+          <Space>
+            {getDeviceIcon(session.deviceType)}
+            <span>{getDeviceTypeName(session.deviceType)}</span>
+            {session.isCurrent && (
+              <Tag color="green" data-testid="current-session-tag">
+                当前会话
+              </Tag>
+            )}
+          </Space>
+        </Space>
+
+        {/* 浏览器和系统 */}
+        <div>
+          <Text strong>{session.browser}</Text>
+          <br />
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {session.os}
+          </Text>
+        </div>
+
+        {/* IP 地址 */}
+        <Space>
+          <GlobalOutlined />
+          <span>{session.ipAddress}</span>
+          {session.location && (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              ({session.location})
+            </Text>
+          )}
+        </Space>
+
+        {/* 最后活动时间 */}
+        <Space>
+          <ClockCircleOutlined />
+          <span data-testid="relative-time">{formatRelativeTime(session.lastActivityAt)}</span>
+        </Space>
+
+        {/* 操作按钮 */}
+        <Button
+          type="primary"
+          danger
+          block
+          icon={<DeleteOutlined />}
+          disabled={session.isCurrent}
+          loading={terminatingId === session.sessionId}
+          onClick={() => handleTerminate(session.sessionId, session.isCurrent)}
+          data-testid={`terminate-btn-${session.sessionId}`}
+          style={{ minHeight: 44 }} // 移动端触摸目标大小
+        >
+          终止会话
+        </Button>
+      </Space>
+    </Card>
+  )
+
   return (
     <Card
       title={
-        <Space>
+        <Space wrap>
           <Title level={5} style={{ margin: 0 }}>
             活动会话
           </Title>
@@ -257,7 +328,7 @@ export const SessionList: React.FC<SessionListProps> = ({ currentSessionId: _cur
         </Space>
       }
       extra={
-        <Space>
+        <Space wrap>
           <Button icon={<ReloadOutlined />} onClick={loadSessions} loading={loading}>
             刷新
           </Button>
@@ -282,7 +353,16 @@ export const SessionList: React.FC<SessionListProps> = ({ currentSessionId: _cur
         </div>
       ) : sessions.length === 0 ? (
         <Empty description="暂无会话" />
+      ) : isMobile ? (
+        // 移动端卡片布局
+        <List
+          dataSource={sessions}
+          renderItem={renderMobileCard}
+          loading={loading}
+          data-testid="session-list-mobile"
+        />
       ) : (
+        // 桌面端表格布局
         <Table
           columns={columns}
           dataSource={sessions}
@@ -290,6 +370,7 @@ export const SessionList: React.FC<SessionListProps> = ({ currentSessionId: _cur
           pagination={false}
           loading={loading}
           data-testid="session-table"
+          scroll={{ x: 'max-content' }}
         />
       )}
     </Card>
