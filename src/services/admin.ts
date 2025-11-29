@@ -18,8 +18,18 @@ export async function getUserList(
   page: number = 1,
   pageSize: number = 10
 ): Promise<AdminUserListResponse> {
-  const response = await get<AdminUserListResponse>('/admin/users', { page, pageSize })
-  return response.data!
+  // 前端页码从1开始，后端从0开始，需要转换
+  const backendPage = page - 1
+  const response = await get<any>('/admin/users', { page: backendPage, size: pageSize })
+  const data = response.data!
+  
+  // 转换后端 Spring Data 分页格式为前端期望格式
+  return {
+    users: data.content || [],
+    total: data.totalElements || 0,
+    page: (data.page || 0) + 1, // 后端的 page 字段是当前页码（从0开始），转换为前端的1开始
+    pageSize: data.size || pageSize,
+  }
 }
 
 /**
