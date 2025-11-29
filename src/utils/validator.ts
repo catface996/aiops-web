@@ -95,7 +95,7 @@ export function validatePassword(
   const hasUppercase = /[A-Z]/.test(password)
   const hasLowercase = /[a-z]/.test(password)
   const hasDigit = /[0-9]/.test(password)
-  const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(password)
+  const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(password)
 
   const typeCount = [hasUppercase, hasLowercase, hasDigit, hasSpecial].filter(Boolean).length
 
@@ -160,7 +160,7 @@ export function calculatePasswordStrength(
   const hasUppercase = /[A-Z]/.test(password)
   const hasLowercase = /[a-z]/.test(password)
   const hasDigit = /[0-9]/.test(password)
-  const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(password)
+  const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(password)
 
   const typeCount = [hasUppercase, hasLowercase, hasDigit, hasSpecial].filter(Boolean).length
 

@@ -41,6 +41,7 @@ function getContext(): CapturedContextType {
 // 测试组件用于获取 context 值
 function TestConsumer() {
   const context = useAuthContext()
+  // eslint-disable-next-line react-hooks/globals
   capturedContext = context
   return (
     <div>

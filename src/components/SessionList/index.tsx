@@ -102,7 +102,7 @@ export const SessionList: React.FC<SessionListProps> = ({ currentSessionId: _cur
     try {
       const response = await getSessionList()
       setSessions(response.sessions)
-    } catch (error) {
+    } catch {
       message.error('加载会话列表失败')
     } finally {
       setLoading(false)
