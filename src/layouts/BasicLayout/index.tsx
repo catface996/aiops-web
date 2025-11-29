@@ -7,7 +7,8 @@ import React, { useState, useEffect } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import ProLayout from '@ant-design/pro-layout'
 import type { ProLayoutProps } from '@ant-design/pro-layout'
-import { Dropdown, Switch, Space, Avatar, Typography, message } from 'antd'
+import { Dropdown, Switch, Space, Avatar, Typography, message, Modal } from 'antd'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import {
   LogoutOutlined,
@@ -76,15 +77,27 @@ export const BasicLayout: React.FC<BasicLayoutProps> = ({ children }) => {
     sidebarStorage.setCollapsed(collapsed)
   }, [collapsed])
 
-  // 处理退出登录
-  const handleLogout = async () => {
-    try {
-      await logout()
-      message.success('退出成功')
-      navigate('/login')
-    } catch {
-      message.error('退出失败')
-    }
+  // 处理退出登录（带确认对话框）
+  const handleLogout = () => {
+    Modal.confirm({
+      title: '确认退出',
+      icon: <ExclamationCircleOutlined />,
+      content: '您确定要退出登录吗？',
+      okText: '确认退出',
+      cancelText: '取消',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await logout()
+          message.success('退出成功')
+          navigate('/login')
+        } catch {
+          // 即使 API 调用失败，也清除本地状态并重定向
+          message.warning('退出时发生错误，已清除本地登录状态')
+          navigate('/login')
+        }
+      },
+    })
   }
 
   // 用户下拉菜单
