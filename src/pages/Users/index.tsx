@@ -4,6 +4,7 @@
  */
 import { useState, useEffect } from 'react'
 import { Table, Card, Tag, Button, message, Space, Typography, Modal } from 'antd'
+import type { TablePaginationConfig } from 'antd/es/table'
 import { ReloadOutlined, UnlockOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { getUserList, unlockAccount } from '@/services/admin'
@@ -72,8 +73,10 @@ const UsersPage: React.FC = () => {
   }
 
   // 分页变化
-  const handleTableChange = (newPagination: { current?: number; pageSize?: number }) => {
-    fetchUsers(newPagination.current || 1, newPagination.pageSize || 10)
+  const handleTableChange = (newPagination: TablePaginationConfig) => {
+    const page = newPagination.current || 1
+    const pageSize = newPagination.pageSize || 10
+    fetchUsers(page, pageSize)
   }
 
   // 格式化日期
