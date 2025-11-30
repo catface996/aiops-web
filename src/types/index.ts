@@ -28,3 +28,31 @@ export type {
 
 // 路由相关类型
 export type { RouteConfig, MenuItem } from './route'
+
+// 资源管理相关类型
+export {
+  ResourceStatus,
+  ResourceStatusDisplay,
+  ResourceStatusColor,
+  ResourceTypeCodes,
+  ResourceTypeAttributes,
+} from './resource'
+export type {
+  ResourceType,
+  ResourceTypeCode,
+  ResourceDTO,
+  ResourceAuditLogDTO,
+  CreateResourceRequest,
+  UpdateResourceRequest,
+  UpdateResourceStatusRequest,
+  DeleteResourceRequest,
+  ResourceListParams,
+  PageResult,
+  ResourceApiResponse,
+  ResourceFormData,
+  ResourceAttributeField,
+  ResourceListState,
+  ResourceDetailState,
+  UseResourceListReturn,
+  UseResourceDetailReturn,
+} from './resource'
