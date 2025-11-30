@@ -2,7 +2,7 @@
  * 资源类型图标组件
  * 需求: REQ-FR-003, REQ-FR-014
  */
-import React from 'react'
+import React, { memo } from 'react'
 import {
   CloudServerOutlined,
   AppstoreOutlined,
@@ -39,8 +39,9 @@ const iconMap: Record<string, React.ReactNode> = {
 /**
  * ResourceTypeIcon 组件
  * 根据资源类型显示对应的图标
+ * 使用React.memo优化性能
  */
-export const ResourceTypeIcon: React.FC<ResourceTypeIconProps> = ({
+export const ResourceTypeIcon: React.FC<ResourceTypeIconProps> = memo(({
   type,
   size = 16,
   style,
@@ -62,6 +63,6 @@ export const ResourceTypeIcon: React.FC<ResourceTypeIconProps> = ({
       {icon}
     </span>
   )
-}
+})
 
 export default ResourceTypeIcon

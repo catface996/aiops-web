@@ -2,7 +2,7 @@
  * 状态徽章组件
  * 需求: REQ-FR-054, REQ-FR-055, REQ-FR-056
  */
-import React from 'react'
+import React, { memo } from 'react'
 import { Badge, Dropdown, type MenuProps } from 'antd'
 import { ResourceStatus, ResourceStatusDisplay, ResourceStatusColor } from '@/types'
 
@@ -39,8 +39,9 @@ const getBadgeStatus = (status: string): 'success' | 'error' | 'default' | 'warn
 /**
  * StatusBadge 组件
  * 显示资源状态徽章，支持下拉菜单切换状态
+ * 使用React.memo优化性能
  */
-export const StatusBadge: React.FC<StatusBadgeProps> = ({
+export const StatusBadge: React.FC<StatusBadgeProps> = memo(({
   status,
   onClick,
   disabled = false,
@@ -98,6 +99,6 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   }
 
   return badge
-}
+})
 
 export default StatusBadge

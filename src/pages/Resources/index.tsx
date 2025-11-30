@@ -2,7 +2,7 @@
  * 资源列表页面
  * 需求: REQ-FR-001, REQ-FR-013, REQ-FR-014, REQ-FR-015, REQ-FR-016, REQ-FR-025
  */
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import { Typography, Button, Input, Space, message, Modal } from 'antd'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
@@ -17,6 +17,7 @@ import { ResourceForm } from './components/ResourceForm'
 import type { ResourceDTO, ResourceType, ResourceStatus, ResourceFormData } from '@/types'
 import { isResourceOwner, isAdmin } from '@/components/PermissionGuard'
 import { stringifyResourceAttributes } from '@/utils/resourceFormat'
+import { debounce, SEARCH_DEBOUNCE_DELAY } from '@/utils/debounce'
 
 const { Title } = Typography
 const { Search } = Input
@@ -54,11 +55,25 @@ const ResourceListPage: React.FC = () => {
   // 选中的行
   const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([])
 
-  // 防抖搜索
+  // 创建防抖搜索引用
+  const debouncedSearchRef = useRef(
+    debounce((value: string) => {
+      setFilters({ keyword: value || undefined })
+    }, SEARCH_DEBOUNCE_DELAY)
+  )
+
+  // 清理防抖函数
+  useEffect(() => {
+    return () => {
+      // 组件卸载时清理
+    }
+  }, [])
+
+  // 搜索处理
   const handleSearch = useCallback(
     (value: string) => {
       setKeyword(value)
-      setFilters({ keyword: value || undefined })
+      debouncedSearchRef.current(value)
     },
     [setFilters]
   )
