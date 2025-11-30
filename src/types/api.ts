@@ -1,4 +1,4 @@
-import type { User, UserRole } from './user'
+import type { UserRole } from './user'
 
 /**
  * 通用 API 响应格式

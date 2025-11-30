@@ -12,6 +12,8 @@ const RegisterPage = lazy(() => import('@/pages/Register'))
 const DashboardPage = lazy(() => import('@/pages/Dashboard'))
 const UsersPage = lazy(() => import('@/pages/Users'))
 const AuditPage = lazy(() => import('@/pages/Audit'))
+const ResourceListPage = lazy(() => import('@/pages/Resources'))
+const ResourceDetailPage = lazy(() => import('@/pages/Resources/Detail'))
 const ForbiddenPage = lazy(() => import('@/pages/403'))
 const NotFoundPage = lazy(() => import('@/pages/404'))
 
@@ -98,6 +100,27 @@ export const protectedRoutes: RouteConfig[] = [
     requireAuth: true,
     requiredRoles: ['ROLE_ADMIN'],
     name: '审计日志',
+  },
+  {
+    path: '/resources',
+    element: (
+      <BasicLayout>
+        <ResourceListPage />
+      </BasicLayout>
+    ),
+    requireAuth: true,
+    name: '资源管理',
+  },
+  {
+    path: '/resources/:id',
+    element: (
+      <BasicLayout>
+        <ResourceDetailPage />
+      </BasicLayout>
+    ),
+    requireAuth: true,
+    name: '资源详情',
+    hideInMenu: true,
   },
 ]
 

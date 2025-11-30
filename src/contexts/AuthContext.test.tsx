@@ -113,7 +113,15 @@ describe('AuthContext 属性测试', () => {
         // Mock validateSession 返回有效结果
         mockedValidateSession.mockResolvedValueOnce({
           valid: true,
-          user: user,
+          userInfo: {
+            accountId: user.userId,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            status: 'active',
+            createdAt: user.createdAt,
+            lastLoginAt: user.lastLoginAt,
+          },
         })
 
         // 渲染组件
@@ -155,7 +163,7 @@ describe('AuthContext 属性测试', () => {
       // Mock validateSession 返回无效结果
       mockedValidateSession.mockResolvedValueOnce({
         valid: false,
-        user: undefined,
+        userInfo: undefined,
       })
 
       render(
@@ -316,7 +324,14 @@ describe('AuthContext 属性测试', () => {
 
       mockedValidateSession.mockResolvedValueOnce({
         valid: true,
-        user: user,
+        userInfo: {
+          accountId: user.userId,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          status: 'active',
+          createdAt: user.createdAt,
+        },
       })
 
       mockedLogout.mockResolvedValueOnce()
@@ -364,7 +379,14 @@ describe('AuthContext 属性测试', () => {
 
       mockedValidateSession.mockResolvedValueOnce({
         valid: true,
-        user: user,
+        userInfo: {
+          accountId: user.userId,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          status: 'active',
+          createdAt: user.createdAt,
+        },
       })
 
       // Mock logout 失败
