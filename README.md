@@ -17,11 +17,11 @@ Enterprise-grade frontend application for the AIOps platform, providing secure u
 
 The platform provides powerful topology visualization capabilities for IT resources:
 
-![Topology Diagram 1](doc/image/%E6%8B%93%E6%89%91%E5%9B%BE-1.png)
+![Topology Diagram 1](doc/image/topology-diagram-1.png)
 
 *Interactive topology view showing resource relationships and dependencies*
 
-![Topology Diagram 2](doc/image/%E6%8B%93%E6%89%91%E5%9B%BE-2.png)
+![Topology Diagram 2](doc/image/topology-diagram-2.png)
 
 *Detailed topology diagram with agent associations and monitoring status*
 
