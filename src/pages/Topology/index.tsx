@@ -16,38 +16,18 @@ import type {
   Position,
   ConnectionPoint,
 } from '@/types/topology'
-import { RelationStatus, RelationType, RelationDirection, RelationStrength } from '@/types/topology'
 import { TopologyCanvas, RelationModal } from './components'
 import type { RelationFormData } from './components'
+import {
+  getRelationshipList,
+  createRelationship,
+  updateRelationship,
+  deleteRelationship,
+  relationshipToEdge,
+  resourceToNode,
+} from '@/services/topology'
+import { getResourceList } from '@/services/resource'
 import styles from './index.module.css'
-
-// 模拟节点数据
-const mockNodes: TopologyNodeType[] = [
-  { id: 'node-1', resourceId: 1, name: 'Web Server', type: '服务器', typeCode: 'SERVER', status: 'RUNNING', position: { x: 400, y: 50 } },
-  { id: 'node-2', resourceId: 2, name: 'API Gateway', type: '应用', typeCode: 'APPLICATION', status: 'RUNNING', position: { x: 400, y: 180 } },
-  { id: 'node-3', resourceId: 3, name: 'User Service', type: '应用', typeCode: 'APPLICATION', status: 'RUNNING', position: { x: 200, y: 310 } },
-  { id: 'node-4', resourceId: 4, name: 'Order Service', type: '应用', typeCode: 'APPLICATION', status: 'RUNNING', position: { x: 400, y: 310 } },
-  { id: 'node-5', resourceId: 5, name: 'Payment Service', type: '应用', typeCode: 'APPLICATION', status: 'MAINTENANCE', position: { x: 600, y: 310 } },
-  { id: 'node-6', resourceId: 6, name: 'MySQL Master', type: '数据库', typeCode: 'DATABASE', status: 'RUNNING', position: { x: 150, y: 450 } },
-  { id: 'node-7', resourceId: 7, name: 'MySQL Slave', type: '数据库', typeCode: 'DATABASE', status: 'RUNNING', position: { x: 350, y: 450 } },
-  { id: 'node-8', resourceId: 8, name: 'Redis Cache', type: '中间件', typeCode: 'MIDDLEWARE', status: 'RUNNING', position: { x: 550, y: 450 } },
-  { id: 'node-9', resourceId: 9, name: 'RabbitMQ', type: '中间件', typeCode: 'MIDDLEWARE', status: 'RUNNING', position: { x: 750, y: 450 } },
-  { id: 'node-10', resourceId: 10, name: 'External API', type: 'API', typeCode: 'API', status: 'RUNNING', position: { x: 750, y: 310 } },
-]
-
-// 模拟连线数据
-const mockEdges: TopologyEdgeType[] = [
-  { id: 'edge-1', relationId: 1, source: 'node-1', target: 'node-2', sourceAnchor: 'bottom', targetAnchor: 'top', relationType: RelationType.CALL, direction: RelationDirection.UNIDIRECTIONAL, strength: RelationStrength.STRONG, status: RelationStatus.NORMAL, label: '请求转发' },
-  { id: 'edge-2', relationId: 2, source: 'node-2', target: 'node-3', sourceAnchor: 'bottom', targetAnchor: 'top', relationType: RelationType.CALL, direction: RelationDirection.UNIDIRECTIONAL, strength: RelationStrength.STRONG, status: RelationStatus.NORMAL },
-  { id: 'edge-3', relationId: 3, source: 'node-2', target: 'node-4', sourceAnchor: 'bottom', targetAnchor: 'top', relationType: RelationType.CALL, direction: RelationDirection.UNIDIRECTIONAL, strength: RelationStrength.STRONG, status: RelationStatus.NORMAL },
-  { id: 'edge-4', relationId: 4, source: 'node-2', target: 'node-5', sourceAnchor: 'bottom', targetAnchor: 'top', relationType: RelationType.CALL, direction: RelationDirection.UNIDIRECTIONAL, strength: RelationStrength.WEAK, status: RelationStatus.NORMAL },
-  { id: 'edge-5', relationId: 5, source: 'node-3', target: 'node-6', sourceAnchor: 'bottom', targetAnchor: 'top', relationType: RelationType.DEPENDENCY, direction: RelationDirection.UNIDIRECTIONAL, strength: RelationStrength.STRONG, status: RelationStatus.NORMAL, label: '读写' },
-  { id: 'edge-6', relationId: 6, source: 'node-4', target: 'node-7', sourceAnchor: 'bottom', targetAnchor: 'top', relationType: RelationType.DEPENDENCY, direction: RelationDirection.UNIDIRECTIONAL, strength: RelationStrength.STRONG, status: RelationStatus.NORMAL, label: '只读' },
-  { id: 'edge-7', relationId: 7, source: 'node-4', target: 'node-8', sourceAnchor: 'bottom', targetAnchor: 'top', relationType: RelationType.DEPENDENCY, direction: RelationDirection.UNIDIRECTIONAL, strength: RelationStrength.WEAK, status: RelationStatus.NORMAL, label: '缓存' },
-  { id: 'edge-8', relationId: 8, source: 'node-5', target: 'node-9', sourceAnchor: 'bottom', targetAnchor: 'top', relationType: RelationType.DEPENDENCY, direction: RelationDirection.UNIDIRECTIONAL, strength: RelationStrength.STRONG, status: RelationStatus.NORMAL, label: '消息' },
-  { id: 'edge-9', relationId: 9, source: 'node-5', target: 'node-10', sourceAnchor: 'bottom', targetAnchor: 'top', relationType: RelationType.CALL, direction: RelationDirection.UNIDIRECTIONAL, strength: RelationStrength.WEAK, status: RelationStatus.NORMAL, label: '支付回调' },
-  { id: 'edge-10', relationId: 10, source: 'node-6', target: 'node-7', sourceAnchor: 'bottom', targetAnchor: 'top', relationType: RelationType.ASSOCIATE, direction: RelationDirection.UNIDIRECTIONAL, strength: RelationStrength.STRONG, status: RelationStatus.NORMAL, label: '主从同步' },
-]
 
 /**
  * 拓扑页面组件
@@ -70,20 +50,82 @@ const TopologyPage: React.FC = () => {
   const [editingEdge, setEditingEdge] = useState<TopologyEdgeType | null>(null)
   const [modalLoading, setModalLoading] = useState(false)
 
+  // 保存节点位置到 localStorage
+  const saveNodePositions = useCallback((nodeList: TopologyNodeType[]) => {
+    const positions: Record<string, Position> = {}
+    nodeList.forEach((node) => {
+      positions[node.id] = node.position
+    })
+    localStorage.setItem('topology-node-positions', JSON.stringify(positions))
+  }, [])
+
+  // 从 localStorage 读取节点位置
+  const loadNodePositions = useCallback((): Record<string, Position> => {
+    try {
+      const saved = localStorage.getItem('topology-node-positions')
+      return saved ? JSON.parse(saved) : {}
+    } catch {
+      return {}
+    }
+  }, [])
+
+  // 自动布局节点（当没有保存位置时）
+  const autoLayoutNodes = useCallback((nodeList: TopologyNodeType[]): TopologyNodeType[] => {
+    const savedPositions = loadNodePositions()
+    const COLS = 4 // 每行节点数
+    const X_GAP = 200 // 水平间距
+    const Y_GAP = 150 // 垂直间距
+    const START_X = 100 // 起始 X
+    const START_Y = 50 // 起始 Y
+
+    return nodeList.map((node, index) => {
+      // 如果有保存的位置，使用保存的位置
+      if (savedPositions[node.id]) {
+        return { ...node, position: savedPositions[node.id] }
+      }
+      // 否则自动布局
+      const col = index % COLS
+      const row = Math.floor(index / COLS)
+      return {
+        ...node,
+        position: {
+          x: START_X + col * X_GAP,
+          y: START_Y + row * Y_GAP,
+        },
+      }
+    })
+  }, [loadNodePositions])
+
   // 加载资源数据
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      // 使用模拟数据
-      setNodes([...mockNodes])
-      setEdges([...mockEdges])
+      // 并行加载资源列表和关系列表
+      const [resourceResult, relationshipResult] = await Promise.all([
+        getResourceList({ page: 1, size: 100 }),
+        getRelationshipList({ pageNum: 1, pageSize: 100 }),
+      ])
+
+      // 转换资源为节点
+      const nodeList = resourceResult.content.map((resource) =>
+        resourceToNode(resource, { x: 100, y: 100 })
+      )
+
+      // 应用保存的位置或自动布局
+      const layoutedNodes = autoLayoutNodes(nodeList)
+
+      // 转换关系为边
+      const edgeList = relationshipResult.content.map(relationshipToEdge)
+
+      setNodes(layoutedNodes)
+      setEdges(edgeList)
     } catch (error) {
       message.error('加载数据失败')
       console.error('Failed to load topology data:', error)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [autoLayoutNodes])
 
   useEffect(() => {
     loadData()
@@ -91,12 +133,15 @@ const TopologyPage: React.FC = () => {
 
   // 节点移动
   const handleNodeMove = useCallback((nodeId: string, position: Position) => {
-    setNodes((prev) =>
-      prev.map((node) =>
+    setNodes((prev) => {
+      const newNodes = prev.map((node) =>
         node.id === nodeId ? { ...node, position } : node
       )
-    )
-  }, [])
+      // 保存位置到 localStorage
+      saveNodePositions(newNodes)
+      return newNodes
+    })
+  }, [saveNodePositions])
 
   // 节点点击
   const handleNodeClick = useCallback((nodeId: string) => {
@@ -151,24 +196,18 @@ const TopologyPage: React.FC = () => {
   const handleCreateRelation = useCallback(async (data: RelationFormData) => {
     setModalLoading(true)
     try {
-      // TODO: 调用后端 API 创建关系
-      // const relation = await createRelation(data)
-
-      // 模拟创建成功，添加到本地状态
-      const newEdge: TopologyEdgeType = {
-        id: `edge-${Date.now()}`,
-        relationId: Date.now(),
-        source: `node-${data.sourceId}`,
-        target: `node-${data.targetId}`,
-        sourceAnchor: 'bottom',
-        targetAnchor: 'top',
-        relationType: data.relationType,
+      // 调用后端 API 创建关系
+      const relationshipData = await createRelationship({
+        sourceResourceId: data.sourceId,
+        targetResourceId: data.targetId,
+        relationshipType: data.relationType,
         direction: data.direction,
         strength: data.strength,
-        status: RelationStatus.NORMAL,
-        label: data.description,
-      }
+        description: data.description,
+      })
 
+      // 添加到本地状态
+      const newEdge = relationshipToEdge(relationshipData)
       setEdges((prev) => [...prev, newEdge])
       message.success('关系创建成功')
       setModalOpen(false)
@@ -188,21 +227,18 @@ const TopologyPage: React.FC = () => {
 
     setModalLoading(true)
     try {
-      // TODO: 调用后端 API 更新关系
-      // await updateRelation(editingEdge.relationId, data)
+      // 调用后端 API 更新关系
+      const updatedData = await updateRelationship(editingEdge.relationId, {
+        relationshipType: data.relationType,
+        strength: data.strength,
+        description: data.description,
+      })
 
       // 更新本地状态
+      const updatedEdge = relationshipToEdge(updatedData)
       setEdges((prev) =>
         prev.map((edge) =>
-          edge.id === editingEdge.id
-            ? {
-                ...edge,
-                relationType: data.relationType,
-                direction: data.direction,
-                strength: data.strength,
-                label: data.description,
-              }
-            : edge
+          edge.id === editingEdge.id ? updatedEdge : edge
         )
       )
 
@@ -222,9 +258,12 @@ const TopologyPage: React.FC = () => {
     if (!selectedEdgeId) return
 
     try {
-      // TODO: 调用后端 API 删除关系
-      // const edge = edges.find((e) => e.id === selectedEdgeId)
-      // if (edge) await deleteRelation(edge.relationId)
+      // 查找要删除的边
+      const edge = edges.find((e) => e.id === selectedEdgeId)
+      if (edge) {
+        // 调用后端 API 删除关系
+        await deleteRelationship(edge.relationId)
+      }
 
       setEdges((prev) => prev.filter((e) => e.id !== selectedEdgeId))
       setSelectedEdgeId(null)
@@ -233,7 +272,7 @@ const TopologyPage: React.FC = () => {
       message.error('删除关系失败')
       console.error('Failed to delete relation:', error)
     }
-  }, [selectedEdgeId])
+  }, [selectedEdgeId, edges])
 
   // 弹窗提交
   const handleModalOk = useCallback((data: RelationFormData) => {

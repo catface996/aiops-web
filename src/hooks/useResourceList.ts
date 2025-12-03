@@ -77,12 +77,18 @@ export function useResourceList(): UseResourceListReturn {
    * 更新过滤条件
    */
   const setFilters = useCallback((newFilters: Partial<ResourceListParams>) => {
-    setFiltersState((prev) => ({
-      ...prev,
-      ...newFilters,
-      // 更新过滤条件时重置页码
-      page: newFilters.page ?? 1,
-    }))
+    setFiltersState((prev) => {
+      // 如果明确传入了 page，使用传入的值；否则检查是否有其他过滤条件变化
+      const hasFilterChange = Object.keys(newFilters).some(
+        (key) => key !== 'page' && key !== 'size'
+      )
+      return {
+        ...prev,
+        ...newFilters,
+        // 只有当过滤条件变化且没有明确传入 page 时才重置页码
+        page: newFilters.page !== undefined ? newFilters.page : (hasFilterChange ? 1 : prev.page),
+      }
+    })
   }, [])
 
   /**
@@ -90,10 +96,7 @@ export function useResourceList(): UseResourceListReturn {
    */
   const setPagination = useCallback(
     (newPagination: { current?: number; pageSize?: number }) => {
-      setPaginationState((prev) => ({
-        ...prev,
-        ...newPagination,
-      }))
+      // 只更新 filtersState，paginationState 会在 loadResources 成功后根据后端返回更新
       setFiltersState((prev) => ({
         ...prev,
         page: newPagination.current ?? prev.page,

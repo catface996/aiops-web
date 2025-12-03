@@ -6,14 +6,14 @@
 // ==================== 关系类型定义 ====================
 
 /**
- * 关系类型枚举
+ * 关系类型枚举（与后端一致）
  */
 export const RelationType = {
   DEPENDENCY: 'DEPENDENCY', // 依赖
   CALL: 'CALL', // 调用
-  DEPLOY: 'DEPLOY', // 部署
-  BELONG: 'BELONG', // 归属
-  ASSOCIATE: 'ASSOCIATE', // 关联
+  DEPLOYMENT: 'DEPLOYMENT', // 部署
+  OWNERSHIP: 'OWNERSHIP', // 归属
+  ASSOCIATION: 'ASSOCIATION', // 关联
 } as const
 
 export type RelationType = (typeof RelationType)[keyof typeof RelationType]
@@ -24,9 +24,9 @@ export type RelationType = (typeof RelationType)[keyof typeof RelationType]
 export const RelationTypeDisplay: Record<RelationType, string> = {
   DEPENDENCY: '依赖',
   CALL: '调用',
-  DEPLOY: '部署',
-  BELONG: '归属',
-  ASSOCIATE: '关联',
+  DEPLOYMENT: '部署',
+  OWNERSHIP: '归属',
+  ASSOCIATION: '关联',
 }
 
 /**
@@ -35,9 +35,9 @@ export const RelationTypeDisplay: Record<RelationType, string> = {
 export const RelationTypeColor: Record<RelationType, string> = {
   DEPENDENCY: '#1890ff', // 蓝色
   CALL: '#52c41a', // 绿色
-  DEPLOY: '#722ed1', // 紫色
-  BELONG: '#fa8c16', // 橙色
-  ASSOCIATE: '#eb2f96', // 粉色
+  DEPLOYMENT: '#722ed1', // 紫色
+  OWNERSHIP: '#fa8c16', // 橙色
+  ASSOCIATION: '#eb2f96', // 粉色
 }
 
 /**
@@ -94,63 +94,79 @@ export const RelationStatusDisplay: Record<RelationStatus, string> = {
   ABNORMAL: '异常',
 }
 
-// ==================== 关系DTO定义 ====================
+// ==================== 关系DTO定义（与后端API完全一致）====================
 
 /**
- * 关系DTO（与后端一致）
+ * 关系DTO（与后端 RelationshipDTO 一致）
  */
-export interface RelationDTO {
+export interface RelationshipDTO {
   id: number
-  sourceId: number
-  sourceName: string
-  sourceType: string
-  targetId: number
-  targetName: string
-  targetType: string
-  relationType: RelationType
-  direction: RelationDirection
-  strength: RelationStrength
-  status: RelationStatus
+  sourceResourceId: number
+  sourceResourceName: string
+  targetResourceId: number
+  targetResourceName: string
+  relationshipType: string
+  relationshipTypeDesc: string
+  direction: string
+  directionDesc: string
+  strength: string
+  strengthDesc: string
+  status: string
+  statusDesc: string
   description: string | null
   createdAt: string
   updatedAt: string
-  createdBy: number
 }
 
 /**
- * 创建关系请求
+ * 创建关系请求（与后端 CreateRelationshipRequest 一致）
  */
-export interface CreateRelationRequest {
-  sourceId: number
-  targetId: number
-  relationType: RelationType
-  direction: RelationDirection
-  strength: RelationStrength
+export interface CreateRelationshipRequest {
+  sourceResourceId: number
+  targetResourceId: number
+  relationshipType: string
+  direction: string
+  strength: string
   description?: string
 }
 
 /**
- * 更新关系请求
+ * 更新关系请求（与后端 UpdateRelationshipRequest 一致）
  */
-export interface UpdateRelationRequest {
-  relationType?: RelationType
-  direction?: RelationDirection
-  strength?: RelationStrength
-  status?: RelationStatus
+export interface UpdateRelationshipRequest {
+  relationshipType?: string
+  strength?: string
+  status?: string
   description?: string
 }
 
 /**
  * 关系查询参数
  */
-export interface RelationListParams {
-  sourceId?: number
-  targetId?: number
-  relationType?: RelationType
-  status?: RelationStatus
-  page?: number
-  size?: number
+export interface RelationshipListParams {
+  sourceResourceId?: number
+  targetResourceId?: number
+  relationshipType?: string
+  status?: string
+  pageNum?: number
+  pageSize?: number
 }
+
+/**
+ * 资源关系响应（上游+下游）
+ */
+export interface ResourceRelationshipsDTO {
+  resourceId: number
+  resourceName: string
+  upstreamRelationships: RelationshipDTO[]
+  downstreamRelationships: RelationshipDTO[]
+}
+
+// 兼容旧类型名（别名）
+export type RelationDTO = RelationshipDTO
+export type CreateRelationRequest = CreateRelationshipRequest
+export type UpdateRelationRequest = UpdateRelationshipRequest
+export type RelationListParams = RelationshipListParams
 
 // ==================== 拓扑画布类型定义 ====================
 
