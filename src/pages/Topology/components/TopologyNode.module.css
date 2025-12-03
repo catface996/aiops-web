@@ -1,0 +1,102 @@
+/**
+ * 拓扑节点样式
+ */
+
+.nodeGroup {
+  transition: filter 0.2s;
+}
+
+.nodeGroup:hover {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.nodeRect {
+  fill: #ffffff;
+  stroke: #d9d9d9;
+  stroke-width: 1px;
+  transition: stroke 0.2s, stroke-width 0.2s, filter 0.2s;
+}
+
+.nodeRect:hover {
+  stroke: #1890ff;
+  stroke-width: 2px;
+}
+
+.nodeRect.selected {
+  stroke: #1890ff;
+  stroke-width: 2px;
+  filter: drop-shadow(0 0 8px rgba(24, 144, 255, 0.4));
+}
+
+.nodeContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  user-select: none;
+}
+
+.nodeIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.nodeInfo {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.nodeName {
+  font-size: 14px;
+  font-weight: 500;
+  color: #262626;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nodeType {
+  font-size: 12px;
+  color: #8c8c8c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 连接点样式 */
+.anchor {
+  fill: #ffffff;
+  stroke: #d9d9d9;
+  stroke-width: 2px;
+  cursor: crosshair;
+  transition: fill 0.2s, stroke 0.2s, stroke-width 0.2s;
+}
+
+.anchor:hover {
+  fill: #1890ff;
+  stroke: #1890ff;
+  stroke-width: 3px;
+}
+
+.anchorActive {
+  fill: #e6f7ff;
+  stroke: #1890ff;
+  stroke-width: 3px;
+  animation: anchorPulse 1s infinite;
+}
+
+@keyframes anchorPulse {
+  0% {
+    stroke-width: 3px;
+    opacity: 1;
+  }
+  50% {
+    stroke-width: 4px;
+    opacity: 0.8;
+  }
+  100% {
+    stroke-width: 3px;
+    opacity: 1;
+  }
+}

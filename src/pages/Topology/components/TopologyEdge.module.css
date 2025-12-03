@@ -1,0 +1,91 @@
+/**
+ * 拓扑连线样式 - 高速公路风格
+ */
+
+.edgeGroup {
+  /* 允许子元素接收事件 */
+}
+
+.edgeHitArea {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 28px;
+  cursor: pointer;
+  pointer-events: stroke;
+}
+
+/* 高速公路外边框 */
+.edgeOutline {
+  fill: none;
+  stroke-width: 10px;
+  stroke-linecap: round;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* 高速公路主路径 */
+.edgePath {
+  fill: none;
+  stroke-width: 6px;
+  stroke-linecap: round;
+  opacity: 0.7;
+  transition: stroke-width 0.2s, opacity 0.2s;
+  pointer-events: none;
+}
+
+.edgePath.selected {
+  stroke-width: 8px;
+  opacity: 1;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+/* 高速公路中线（虚线装饰） */
+.edgeCenterLine {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-dasharray: 8 12;
+  pointer-events: none;
+}
+
+/* 流动箭头容器 */
+.flowArrowGroup {
+  pointer-events: none;
+}
+
+/* 流动箭头 */
+.flowArrow {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+/* 标签背景 */
+.labelBackground {
+  fill: rgba(255, 255, 255, 0.95);
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* 标签文字 */
+.labelText {
+  font-size: 12px;
+  font-weight: 500;
+  fill: #262626;
+  user-select: none;
+}
+
+/* 临时连线（拖拽中） */
+.tempEdge {
+  fill: none;
+  stroke: #1890ff;
+  stroke-width: 4px;
+  stroke-linecap: round;
+  stroke-dasharray: 8 8;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* 箭头样式 */
+.arrowHead {
+  transition: transform 0.2s;
+}

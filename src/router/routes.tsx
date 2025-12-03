@@ -14,6 +14,7 @@ const UsersPage = lazy(() => import('@/pages/Users'))
 const AuditPage = lazy(() => import('@/pages/Audit'))
 const ResourceListPage = lazy(() => import('@/pages/Resources'))
 const ResourceDetailPage = lazy(() => import('@/pages/Resources/Detail'))
+const TopologyPage = lazy(() => import('@/pages/Topology'))
 const ForbiddenPage = lazy(() => import('@/pages/403'))
 const NotFoundPage = lazy(() => import('@/pages/404'))
 
@@ -121,6 +122,16 @@ export const protectedRoutes: RouteConfig[] = [
     requireAuth: true,
     name: '资源详情',
     hideInMenu: true,
+  },
+  {
+    path: '/topology',
+    element: (
+      <BasicLayout>
+        <TopologyPage />
+      </BasicLayout>
+    ),
+    requireAuth: true,
+    name: '拓扑图',
   },
 ]
 
