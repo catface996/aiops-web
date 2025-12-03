@@ -1,73 +1,116 @@
-# React + TypeScript + Vite
+# AIOps Web Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Enterprise-grade frontend application for the AIOps platform, providing secure user authentication, role-based access control (RBAC), and administrative capabilities.
 
-Currently, two official plugins are available:
+## Core Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- User registration and authentication (username/email login)
+- Session management with JWT tokens
+- Role-based routing and menu control (User, Admin)
+- User management interface (Admin only)
+- Audit log viewing (Admin only)
+- IT resource management and topology visualization
+- Agent configuration and execution
+- LLM service integration
 
-## React Compiler
+## Topology Visualization
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The platform provides powerful topology visualization capabilities for IT resources:
 
-## Expanding the ESLint configuration
+![Topology Diagram 1](doc/image/拓扑图-1.png)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+*Interactive topology view showing resource relationships and dependencies*
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+![Topology Diagram 2](doc/image/拓扑图-2.png)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+*Detailed topology diagram with agent associations and monitoring status*
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Technology Stack
+
+- **React** 18.x - Frontend framework with concurrent features
+- **TypeScript** 5.x - Type safety with strict mode enabled
+- **Ant Design** 5.x - Enterprise UI component library
+- **Ant Design Pro** 6.x - Out-of-the-box admin solution
+- **React Router** 6.x - Declarative routing
+- **Axios** - HTTP client with interceptors
+- **Vite** 5.x - Fast build tool and dev server
+- **Vitest** - Unit testing framework
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm
+
+### Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Environment Configuration
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Create `.env.development` and `.env.production` files:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```env
+VITE_API_BASE_URL=http://localhost:8080/api/v1
+VITE_APP_TITLE=AIOps Platform
 ```
+
+## Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
+
+# Format code
+npm run format
+```
+
+## Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+├── layouts/            # Layout components (BasicLayout, UserLayout, BlankLayout)
+├── pages/              # Page components (route-level)
+├── contexts/           # React Context providers
+├── hooks/              # Custom React hooks
+├── services/           # API service layer
+├── utils/              # Utility functions
+├── types/              # TypeScript type definitions
+├── router/             # Route configuration
+└── main.tsx            # Application entry point
+```
+
+## User Roles
+
+- **Regular User**: Access to dashboard and personal settings
+- **System Administrator**: Full access including user management and audit logs
+
+## Documentation
+
+For detailed feature documentation, see the [doc/features](doc/features) directory.
+
+## License
+
+[Your License Here]
