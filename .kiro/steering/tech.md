@@ -1,3 +1,7 @@
+---
+inclusion: always
+---
+
 # Technology Stack
 
 ## Core Technologies
@@ -16,12 +20,36 @@
 - **React Testing Library**: Component testing
 - **fast-check**: Latest stable - Property-based testing (minimum 100 iterations per property)
 
+## Topology Visualization
+
+- **Implementation**: Custom SVG-based solution (no third-party library)
+- **Features**:
+  - Interactive node dragging and positioning
+  - Zoom and pan with mouse wheel and drag
+  - Connection points for creating relationships
+  - Node and edge selection
+  - Double-click to open details
+  - Position persistence in LocalStorage
+  - Auto-layout algorithm for initial positioning
+- **Components**:
+  - `TopologyCanvas`: Main canvas component managing interactions
+  - `TopologyNode`: Individual node component with drag support
+  - `TopologyEdge`: Edge component with arrow markers
+  - `RelationModal`: Modal for creating/editing relationships
+- **Advantages**:
+  - Full control over rendering and interactions
+  - Lightweight (no external dependencies)
+  - Customizable to specific requirements
+  - Better performance for moderate-sized graphs (<500 nodes)
+- **Location**: `src/pages/Topology/components/`
+
 ## Key Technical Decisions
 
 - **State Management**: React Context + Hooks (no Redux - keeps it lightweight)
 - **Authentication**: JWT tokens stored in LocalStorage
 - **API Base Path**: `/api/v1`
 - **Build Target**: ES2015
+- **Topology Visualization**: Custom SVG implementation (not G6 or React Flow)
 
 ## Common Commands
 
