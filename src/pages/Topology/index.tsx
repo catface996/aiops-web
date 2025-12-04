@@ -27,6 +27,7 @@ import {
   resourceToNode,
 } from '@/services/topology'
 import { getResourceList } from '@/services/resource'
+import { isHandledError } from '@/utils/request'
 import styles from './index.module.css'
 
 /**
@@ -214,7 +215,10 @@ const TopologyPage: React.FC = () => {
       setConnectSourceNode(null)
       setConnectTargetNode(null)
     } catch (error) {
-      message.error('创建关系失败')
+      // 已处理的错误（如 403）无需再显示 toast
+      if (!isHandledError(error)) {
+        message.error('创建关系失败')
+      }
       console.error('Failed to create relation:', error)
     } finally {
       setModalLoading(false)
@@ -246,7 +250,10 @@ const TopologyPage: React.FC = () => {
       setModalOpen(false)
       setEditingEdge(null)
     } catch (error) {
-      message.error('更新关系失败')
+      // 已处理的错误（如 403）无需再显示 toast
+      if (!isHandledError(error)) {
+        message.error('更新关系失败')
+      }
       console.error('Failed to update relation:', error)
     } finally {
       setModalLoading(false)
@@ -269,7 +276,10 @@ const TopologyPage: React.FC = () => {
       setSelectedEdgeId(null)
       message.success('关系删除成功')
     } catch (error) {
-      message.error('删除关系失败')
+      // 已处理的错误（如 403）无需再显示 toast
+      if (!isHandledError(error)) {
+        message.error('删除关系失败')
+      }
       console.error('Failed to delete relation:', error)
     }
   }, [selectedEdgeId, edges])
