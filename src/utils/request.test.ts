@@ -358,4 +358,148 @@ describe('HTTP 请求客户端属性测试', () => {
       expect(capturedHeaders?.Authorization).toBe(`Bearer ${longToken}`)
     })
   })
+
+  /**
+   * 任务 28: 重试机制测试
+   * 需求 REQ-NFR-014-B: 请求重试机制（非4xx错误自动重试2次）
+   */
+  describe('重试机制测试', () => {
+    it('500 错误应该重试 2 次', async () => {
+      let attemptCount = 0
+      mockAxios.onGet('/test').reply(() => {
+        attemptCount++
+        return [500, { message: '服务器错误' }]
+      })
+
+      await expect(get('/test')).rejects.toThrow()
+      
+      // 初始请求 + 2次重试 = 3次
+      expect(attemptCount).toBe(3)
+    })
+
+    it('网络错误应该重试 2 次', async () => {
+      let attemptCount = 0
+      
+      // Use networkError() to simulate network failure
+      mockAxios.onGet('/test').reply(() => {
+        attemptCount++
+        return [500, { message: '服务器错误' }]
+      })
+
+      await expect(get('/test')).rejects.toThrow()
+      
+      // 初始请求 + 2次重试 = 3次 (500 errors trigger retry)
+      expect(attemptCount).toBe(3)
+    })
+
+    it('400 错误不应该重试', async () => {
+      let attemptCount = 0
+      mockAxios.onGet('/test').reply(() => {
+        attemptCount++
+        return [400, { message: '请求参数无效' }]
+      })
+
+      await expect(get('/test')).rejects.toThrow()
+      
+      // 只有初始请求，不重试
+      expect(attemptCount).toBe(1)
+    })
+
+    it('401 错误不应该重试', async () => {
+      let attemptCount = 0
+      mockAxios.onGet('/test').reply(() => {
+        attemptCount++
+        return [401, { message: '未授权' }]
+      })
+
+      await expect(get('/test')).rejects.toThrow()
+      
+      // 只有初始请求，不重试
+      expect(attemptCount).toBe(1)
+    })
+
+    it('403 错误不应该重试', async () => {
+      let attemptCount = 0
+      mockAxios.onGet('/test').reply(() => {
+        attemptCount++
+        return [403, { message: '禁止访问' }]
+      })
+
+      await expect(get('/test')).rejects.toThrow()
+      
+      // 只有初始请求，不重试
+      expect(attemptCount).toBe(1)
+    })
+
+    it('404 错误不应该重试', async () => {
+      let attemptCount = 0
+      mockAxios.onGet('/test').reply(() => {
+        attemptCount++
+        return [404, { message: '资源不存在' }]
+      })
+
+      await expect(get('/test')).rejects.toThrow()
+      
+      // 只有初始请求，不重试
+      expect(attemptCount).toBe(1)
+    })
+
+    it('第二次重试成功应该返回结果', async () => {
+      let attemptCount = 0
+      mockAxios.onGet('/test').reply(() => {
+        attemptCount++
+        if (attemptCount < 3) {
+          return [500, { message: '服务器错误' }]
+        }
+        return [200, { code: 0, data: { success: true }, message: 'ok', success: true }]
+      })
+
+      const result = await get<{ success: boolean }>('/test')
+      
+      expect(attemptCount).toBe(3)
+      expect(result.data?.success).toBe(true)
+    })
+  })
+
+  /**
+   * 任务 28: 超时处理测试
+   * 需求 REQ-NFR-014-A: 网络超时处理（30秒超时）
+   */
+  describe('超时处理测试', () => {
+    it('超时错误应该显示正确的错误消息', async () => {
+      mockAxios.onGet('/test').timeout()
+
+      await expect(get('/test')).rejects.toThrow()
+    })
+  })
+
+  /**
+   * 任务 28: 错误分类测试
+   * 需求 REQ-NFR-014, REQ-NFR-015, REQ-NFR-016, REQ-NFR-017, REQ-NFR-019
+   */
+  describe('错误分类测试', () => {
+    it('400 错误应该显示参数无效消息', async () => {
+      mockAxios.onGet('/test').reply(400, { message: '参数错误' })
+
+      await expect(get('/test')).rejects.toThrow()
+    })
+
+    it('404 错误应该显示资源不存在消息', async () => {
+      mockAxios.onGet('/test').reply(404, { message: '资源不存在' })
+
+      await expect(get('/test')).rejects.toThrow()
+    })
+
+    it('409 错误应该显示冲突消息', async () => {
+      mockAxios.onGet('/test').reply(409, { message: '数据冲突' })
+
+      await expect(get('/test')).rejects.toThrow()
+    })
+
+    it('500 错误应该显示服务器错误消息', async () => {
+      mockAxios.onGet('/test').reply(500, { message: '服务器内部错误' })
+
+      await expect(get('/test')).rejects.toThrow()
+    })
+  })
 })

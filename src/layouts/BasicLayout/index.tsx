@@ -52,6 +52,7 @@ const menuRoutes: MenuRoute[] = [
   { path: '/dashboard', name: '仪表盘', icon: <DashboardOutlined /> },
   { path: '/resources', name: '资源管理', icon: <AppstoreOutlined /> },
   { path: '/topology', name: '拓扑图', icon: <DeploymentUnitOutlined /> },
+  { path: '/subgraphs', name: '子图管理', icon: <DeploymentUnitOutlined /> },
   { path: '/users', name: '用户管理', icon: <TeamOutlined />, requiredRoles: ['ROLE_ADMIN'] },
   { path: '/audit', name: '审计日志', icon: <AuditOutlined />, requiredRoles: ['ROLE_ADMIN'] },
 ]

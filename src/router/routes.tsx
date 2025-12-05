@@ -15,6 +15,8 @@ const AuditPage = lazy(() => import('@/pages/Audit'))
 const ResourceListPage = lazy(() => import('@/pages/Resources'))
 const ResourceDetailPage = lazy(() => import('@/pages/Resources/Detail'))
 const TopologyPage = lazy(() => import('@/pages/Topology'))
+const SubgraphListPage = lazy(() => import('@/pages/SubgraphManagement/SubgraphList'))
+const SubgraphDetailPage = lazy(() => import('@/pages/SubgraphManagement/SubgraphDetail'))
 const ForbiddenPage = lazy(() => import('@/pages/403'))
 const NotFoundPage = lazy(() => import('@/pages/404'))
 
@@ -132,6 +134,27 @@ export const protectedRoutes: RouteConfig[] = [
     ),
     requireAuth: true,
     name: '拓扑图',
+  },
+  {
+    path: '/subgraphs',
+    element: (
+      <BasicLayout>
+        <SubgraphListPage />
+      </BasicLayout>
+    ),
+    requireAuth: true,
+    name: '子图管理',
+  },
+  {
+    path: '/subgraphs/:id',
+    element: (
+      <BasicLayout>
+        <SubgraphDetailPage />
+      </BasicLayout>
+    ),
+    requireAuth: true,
+    name: '子图详情',
+    hideInMenu: true,
   },
 ]
 

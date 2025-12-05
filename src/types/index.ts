@@ -56,3 +56,28 @@ export type {
   UseResourceListReturn,
   UseResourceDetailReturn,
 } from './resource'
+
+// 子图管理相关类型
+export { PermissionRole } from './subgraph'
+export type {
+  Subgraph,
+  SubgraphDetail,
+  SubgraphUserInfo,
+  ResourceInfo,
+  TopologyData,
+  TopologyNode,
+  TopologyEdge,
+  SubgraphListResponse,
+  CreateSubgraphRequest,
+  UpdateSubgraphRequest,
+  AddResourcesRequest,
+  RemoveResourcesRequest,
+  UpdatePermissionsRequest,
+  SubgraphFormState,
+  SubgraphListQuery,
+  SubgraphPermission,
+  SubgraphListState,
+  SubgraphDetailState,
+  CreateSubgraphFormState,
+  AddResourceModalState,
+} from './subgraph'
