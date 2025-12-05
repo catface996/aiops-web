@@ -1,0 +1,92 @@
+/**
+ * 列表页通用样式
+ *
+ * 所有列表页面必须使用此样式文件，禁止在各页面单独定义筛选栏相关样式
+ *
+ * 使用方式：
+ * import listStyles from '@/styles/list-page.module.css'
+ */
+
+/* ============================================
+   筛选栏区域
+   ============================================ */
+
+/** 筛选栏容器 - 包含筛选控件和操作按钮 */
+.filterBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/** 筛选控件组 - 左侧筛选控件容器 */
+.filterControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/** 操作按钮组 - 右侧操作按钮容器 */
+.actionButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ============================================
+   筛选控件尺寸 - 统一宽度
+   ============================================ */
+
+/** 下拉选择框 - 标准宽度 */
+.selectStandard {
+  width: 220px;
+}
+
+/** 下拉选择框 - 宽型（用于内容较多的选项） */
+.selectWide {
+  width: 240px;
+}
+
+/** 搜索框 - 统一宽度（约为下拉框宽度的1.5倍） */
+.searchInput {
+  width: 330px;
+}
+
+/* ============================================
+   按钮样式 - 统一圆角和高度
+   ============================================ */
+
+/** 主按钮样式 */
+.primaryButton {
+  border-radius: 6px;
+  height: 32px;
+}
+
+/** 小按钮样式 */
+.smallButton {
+  border-radius: 4px;
+}
+
+/* ============================================
+   批量操作栏
+   ============================================ */
+
+/** 批量操作栏容器 */
+.batchActionBar {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #e6f4ff 0%, #f0f5ff 100%);
+  border-radius: 8px;
+  border: 1px solid #91caff;
+}
+
+/** 批量操作栏文字 */
+.batchActionText {
+  font-weight: 500;
+  color: #1677ff;
+}

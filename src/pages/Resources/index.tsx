@@ -3,14 +3,15 @@
  * 需求: REQ-FR-001, REQ-FR-013, REQ-FR-014, REQ-FR-015, REQ-FR-016, REQ-FR-025
  */
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react'
-import { Typography, Button, Input, Space, message, Modal } from 'antd'
+import { Button, Space, message, Modal } from 'antd'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useResourceList } from '@/hooks/useResourceList'
 import { useResourceForm } from '@/hooks/useResourceForm'
 import { createResource, updateResourceStatus, deleteResource } from '@/services/resource'
-import { ResourceFilters } from './components/ResourceFilters'
+import { PageContainer } from '@/components'
+import { ResourceFilterBar } from './components/ResourceFilterBar'
 import { ResourceTable } from './components/ResourceTable'
 import { ResourceTypeSelector } from './components/ResourceTypeSelector'
 import { ResourceForm } from './components/ResourceForm'
@@ -18,9 +19,7 @@ import type { ResourceDTO, ResourceType, ResourceStatus, ResourceFormData } from
 import { isResourceOwner, isAdmin } from '@/components/PermissionGuard'
 import { stringifyResourceAttributes } from '@/utils/resourceFormat'
 import { debounce, SEARCH_DEBOUNCE_DELAY } from '@/utils/debounce'
-
-const { Title } = Typography
-const { Search } = Input
+import listStyles from '@/styles/list-page.module.css'
 
 /**
  * ResourceListPage 组件
@@ -75,7 +74,7 @@ const ResourceListPage: React.FC = () => {
       setKeyword(value)
       debouncedSearchRef.current(value)
     },
-    [setFilters]
+    []
   )
 
   // 分页变更
@@ -207,78 +206,72 @@ const ResourceListPage: React.FC = () => {
   }, [selectedRowKeys, resources, canDelete])
 
   return (
-    <div data-testid="resource-list-page" style={{ padding: '24px' }}>
-      {/* 页面标题和操作按钮 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Title level={2} style={{ margin: 0 }}>
-          资源管理
-        </Title>
-        <Space>
-          <Search
-            placeholder="搜索资源名称"
-            allowClear
+    <div data-testid="resource-list-page">
+      <PageContainer>
+        {/* 筛选栏和操作按钮 */}
+        <div className={listStyles.filterBar}>
+          <ResourceFilterBar
+            filters={filters}
+            onFilterChange={setFilters}
             onSearch={handleSearch}
-            onChange={(e) => !e.target.value && handleSearch('')}
-            style={{ width: 250 }}
+            keyword={keyword}
           />
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={handleOpenTypeSelector}
+            className={listStyles.primaryButton}
           >
             创建资源
           </Button>
-        </Space>
-      </div>
+        </div>
 
-      {/* 批量操作栏 */}
-      {selectedRowKeys.length > 0 && (
-        <div style={{ marginBottom: 16, padding: '8px 16px', background: '#f0f5ff', borderRadius: 4 }}>
-          <Space>
-            <span>已选择 {selectedRowKeys.length} 项</span>
-            {canBatchDelete && (
+        {/* 批量操作栏 */}
+        {selectedRowKeys.length > 0 && (
+          <div className={listStyles.batchActionBar}>
+            <Space>
+              <span className={listStyles.batchActionText}>
+                已选择 {selectedRowKeys.length} 项
+              </span>
+              {canBatchDelete && (
+                <Button
+                  danger
+                  size="small"
+                  icon={<DeleteOutlined />}
+                  onClick={handleBatchDelete}
+                  className={listStyles.smallButton}
+                >
+                  批量删除
+                </Button>
+              )}
               <Button
-                danger
                 size="small"
-                icon={<DeleteOutlined />}
-                onClick={handleBatchDelete}
+                onClick={() => setSelectedRowKeys([])}
+                className={listStyles.smallButton}
               >
-                批量删除
+                取消选择
               </Button>
-            )}
-            <Button size="small" onClick={() => setSelectedRowKeys([])}>
-              取消选择
-            </Button>
-          </Space>
-        </div>
-      )}
+            </Space>
+          </div>
+        )}
 
-      {/* 主内容区域 */}
-      <div style={{ display: 'flex', gap: 16 }}>
-        {/* 左侧过滤器 */}
-        <ResourceFilters
-          filters={filters}
-          onFilterChange={setFilters}
+        {/* 资源表格 */}
+        <ResourceTable
+          resources={resources}
+          loading={loading}
+          pagination={pagination}
+          onPaginationChange={handlePaginationChange}
+          keyword={keyword}
+          selectedRowKeys={selectedRowKeys}
+          onSelectionChange={setSelectedRowKeys}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onStatusChange={handleStatusChange}
+          canEdit={canEdit}
+          canDelete={canDelete}
+          onCreate={handleOpenTypeSelector}
         />
-
-        {/* 右侧表格 */}
-        <div style={{ flex: 1, overflow: 'hidden' }}>
-          <ResourceTable
-            resources={resources}
-            loading={loading}
-            pagination={pagination}
-            onPaginationChange={handlePaginationChange}
-            keyword={keyword}
-            selectedRowKeys={selectedRowKeys}
-            onSelectionChange={setSelectedRowKeys}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onStatusChange={handleStatusChange}
-            canEdit={canEdit}
-            canDelete={canDelete}
-          />
-        </div>
-      </div>
+      </PageContainer>
 
       {/* 类型选择器 */}
       <ResourceTypeSelector

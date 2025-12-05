@@ -161,6 +161,10 @@ export const BasicLayout: React.FC<BasicLayoutProps> = ({ children }) => {
       sider: {
         colorMenuBackground: isDarkMode ? '#141414' : '#fff',
       },
+      pageContainer: {
+        paddingBlockPageContainerContent: 8,
+        paddingInlinePageContainerContent: 24,
+      },
     },
   }
 

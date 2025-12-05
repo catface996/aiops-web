@@ -144,7 +144,9 @@ export interface DeleteResourceRequest {
  */
 export interface ResourceListParams {
   resourceTypeId?: number
+  resourceTypeIds?: number[]
   status?: ResourceStatus
+  statuses?: ResourceStatus[]
   keyword?: string
   page?: number
   size?: number

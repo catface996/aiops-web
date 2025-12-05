@@ -23,7 +23,27 @@ import type {
 export async function getResourceList(
   params: ResourceListParams
 ): Promise<PageResult<ResourceDTO>> {
-  const response = await get<PageResult<ResourceDTO>>('/resources', params as Record<string, unknown>)
+  // 处理多选参数，转换为后端支持的格式
+  const queryParams: Record<string, unknown> = {
+    page: params.page,
+    size: params.size,
+    keyword: params.keyword,
+  }
+
+  // 优先使用多选参数，如果没有则使用单选参数
+  if (params.resourceTypeIds && params.resourceTypeIds.length > 0) {
+    queryParams.resourceTypeIds = params.resourceTypeIds.join(',')
+  } else if (params.resourceTypeId) {
+    queryParams.resourceTypeId = params.resourceTypeId
+  }
+
+  if (params.statuses && params.statuses.length > 0) {
+    queryParams.statuses = params.statuses.join(',')
+  } else if (params.status) {
+    queryParams.status = params.status
+  }
+
+  const response = await get<PageResult<ResourceDTO>>('/resources', queryParams)
   return response.data!
 }
 

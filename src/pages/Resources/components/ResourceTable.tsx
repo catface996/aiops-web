@@ -3,10 +3,10 @@
  * 需求: REQ-FR-014, REQ-FR-021, REQ-FR-024
  */
 import React from 'react'
-import { Table, Space, Button, Tooltip, Typography } from 'antd'
+import { Table, Space, Button, Tooltip, Typography, Empty } from 'antd'
 import type { TableProps, ColumnType } from 'antd/es/table'
 import { Link } from 'react-router-dom'
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { EditOutlined, DeleteOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons'
 import { ResourceTypeIcon } from '@/components/ResourceTypeIcon'
 import { StatusBadge } from '@/components/StatusBadge'
 import type { ResourceDTO, ResourceStatus } from '@/types'
@@ -44,6 +44,8 @@ export interface ResourceTableProps {
   canEdit?: (resource: ResourceDTO) => boolean
   /** 是否可以删除 */
   canDelete?: (resource: ResourceDTO) => boolean
+  /** 创建资源回调（用于空状态） */
+  onCreate?: () => void
 }
 
 /**
@@ -63,6 +65,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
   onStatusChange,
   canEdit = () => true,
   canDelete = () => true,
+  onCreate,
 }) => {
   // 表格列定义
   const columns: ColumnType<ResourceDTO>[] = [
@@ -183,7 +186,22 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
       }}
       scroll={{ x: 'max-content' }}
       locale={{
-        emptyText: keyword ? '没有找到匹配的资源' : '暂无资源',
+        emptyText: (
+          <Empty
+            image={<InboxOutlined style={{ fontSize: 48, color: '#bfbfbf' }} />}
+            description={
+              <div style={{ color: '#8c8c8c' }}>
+                {keyword ? '没有找到匹配的资源' : '暂无资源数据'}
+              </div>
+            }
+          >
+            {!keyword && onCreate && (
+              <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
+                创建资源
+              </Button>
+            )}
+          </Empty>
+        ),
       }}
     />
   )
