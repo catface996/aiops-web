@@ -109,7 +109,8 @@ export function useSubgraphPermission(
    */
   const isOwner = useMemo(() => {
     if (!user || !subgraph) return false;
-    return subgraph.owners.some((owner) => owner.userId === user.userId);
+    const owners = subgraph.owners || [];
+    return owners.some((owner) => owner.userId === user.userId);
   }, [user, subgraph]);
 
   /**
@@ -118,7 +119,8 @@ export function useSubgraphPermission(
    */
   const isViewer = useMemo(() => {
     if (!user || !subgraph) return false;
-    return subgraph.viewers.some((viewer) => viewer.userId === user.userId);
+    const viewers = subgraph.viewers || [];
+    return viewers.some((viewer) => viewer.userId === user.userId);
   }, [user, subgraph]);
 
   /**

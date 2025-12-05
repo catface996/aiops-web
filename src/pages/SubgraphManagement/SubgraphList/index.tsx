@@ -13,7 +13,7 @@
  * REQ-FR-009, REQ-FR-010, REQ-FR-012, REQ-FR-013
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Tooltip,
@@ -22,10 +22,13 @@ import {
   PlusOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { useSubgraphList } from '@/hooks/subgraph/useSubgraphList';
 import { PageContainer } from '@/components';
+import CreateSubgraphModal from '@/components/SubgraphManagement/CreateSubgraphModal';
 import SubgraphFilterBar from './SubgraphFilterBar';
 import SubgraphTable from './SubgraphTable';
+import type { Subgraph } from '@/types/subgraph';
 import listStyles from '@/styles/list-page.module.css';
 
 /**
@@ -37,6 +40,8 @@ import listStyles from '@/styles/list-page.module.css';
  * REQ-FR-013: Search functionality with debounce
  */
 const SubgraphList: React.FC = () => {
+  const navigate = useNavigate();
+
   // Use custom hook for state management
   const {
     subgraphs,
@@ -56,13 +61,31 @@ const SubgraphList: React.FC = () => {
     refetch,
   } = useSubgraphList();
 
+  // Create modal state
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+
   /**
    * Handle create button click
    * REQ-FR-001: Create button in top-right corner
    */
   const handleCreateClick = () => {
-    // TODO: Open create modal (will be implemented in Task 18)
-    console.log('Create subgraph clicked');
+    setCreateModalVisible(true);
+  };
+
+  /**
+   * Handle create modal close
+   */
+  const handleCreateModalClose = () => {
+    setCreateModalVisible(false);
+  };
+
+  /**
+   * Handle create success
+   */
+  const handleCreateSuccess = (subgraph: Subgraph) => {
+    setCreateModalVisible(false);
+    // Navigate to the newly created subgraph detail page
+    navigate(`/subgraphs/${subgraph.id}`);
   };
 
   /**
@@ -132,7 +155,12 @@ const SubgraphList: React.FC = () => {
         />
       </PageContainer>
 
-      {/* TODO: Create Modal will be implemented in Task 18 */}
+      {/* Create Subgraph Modal */}
+      <CreateSubgraphModal
+        visible={createModalVisible}
+        onClose={handleCreateModalClose}
+        onSuccess={handleCreateSuccess}
+      />
     </div>
   );
 };

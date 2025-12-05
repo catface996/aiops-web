@@ -53,6 +53,9 @@ const formatDate = (isoString: string): string => {
  * REQ-FR-024: Display basic information, metadata, timestamps, and statistics
  */
 const OverviewTab: React.FC<OverviewTabProps> = ({ subgraph }) => {
+  const owners = subgraph.owners || [];
+  const viewers = subgraph.viewers || [];
+
   return (
     <div style={{ padding: '24px' }}>
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -62,7 +65,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ subgraph }) => {
             <Card>
               <Statistic
                 title="所有者数量"
-                value={subgraph.owners.length}
+                value={owners.length}
                 prefix={<UserOutlined />}
                 valueStyle={{ color: '#1890ff' }}
               />
@@ -72,7 +75,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ subgraph }) => {
             <Card>
               <Statistic
                 title="查看者数量"
-                value={subgraph.viewers.length}
+                value={viewers.length}
                 prefix={<UserOutlined />}
                 valueStyle={{ color: '#52c41a' }}
               />
@@ -214,9 +217,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ subgraph }) => {
 
         {/* Owners List */}
         <Card title="所有者列表" size="small">
-          {subgraph.owners.length > 0 ? (
+          {owners.length > 0 ? (
             <Descriptions column={1} bordered>
-              {subgraph.owners.map((owner, index) => (
+              {owners.map((owner, index) => (
                 <Descriptions.Item
                   key={owner.userId}
                   label={`所有者 ${index + 1}`}
@@ -237,9 +240,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ subgraph }) => {
 
         {/* Viewers List */}
         <Card title="查看者列表" size="small">
-          {subgraph.viewers.length > 0 ? (
+          {viewers.length > 0 ? (
             <Descriptions column={1} bordered>
-              {subgraph.viewers.map((viewer, index) => (
+              {viewers.map((viewer, index) => (
                 <Descriptions.Item
                   key={viewer.userId}
                   label={`查看者 ${index + 1}`}

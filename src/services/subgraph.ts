@@ -68,8 +68,8 @@ class SubgraphService {
    * REQ-FR-005: Submit creation request
    */
   async createSubgraph(data: CreateSubgraphRequest): Promise<Subgraph> {
-    const response = await request.post<Subgraph>('/subgraphs', data);
-    return response.data;
+    const response = await request.post<{ data: Subgraph }>('/subgraphs', data);
+    return response.data.data;
   }
 
   /**
@@ -137,11 +137,12 @@ class SubgraphService {
       const response = await this.listSubgraphs({
         keyword: name,
         page: 1,
-        pageSize: 1,
+        pageSize: 10,
       });
 
       // Check if any subgraph has exact name match
-      const exists = response.items.some(
+      const items = response.items || [];
+      const exists = items.some(
         (s) => s.name === name && s.id !== excludeId
       );
 
