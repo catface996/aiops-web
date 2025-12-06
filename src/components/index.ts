@@ -11,3 +11,6 @@ export { default as PageBreadcrumb } from './PageBreadcrumb'
 export type { PageBreadcrumbProps, BreadcrumbItem } from './PageBreadcrumb'
 export { default as PageContainer } from './PageContainer'
 export type { PageContainerProps } from './PageContainer'
+
+// Topology components
+export { TopologyCanvas, TopologyNode, TopologyEdge, TempEdge } from './Topology'

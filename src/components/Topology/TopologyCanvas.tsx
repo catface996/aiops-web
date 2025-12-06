@@ -1,11 +1,6 @@
 /**
- * 拓扑画布组件 - 子图管理专用
- * Feature: F08 - 子图管理拓扑可视化
- * Adapted from: F04 TopologyCanvas
- * 
- * Performance Optimizations:
- * - REQ-NFR-003: Throttle drag events (16ms)
- * - REQ-NFR-003: Debounce position save (1000ms)
+ * 拓扑画布组件
+ * Feature: F04 - 主画布，管理节点拖拽、连线、缩放等交互
  */
 import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react'
 import type {
@@ -20,9 +15,6 @@ import type {
 import { NODE_CONSTANTS } from '@/types/topology'
 import { TopologyNode } from './TopologyNode'
 import { TopologyEdge, TempEdge } from './TopologyEdge'
-import { throttle } from '@/utils/throttle'
-import { debounce } from '@/utils/debounce'
-import { DRAG_THROTTLE_DELAY, POSITION_SAVE_DEBOUNCE_DELAY } from '@/utils/throttle'
 import styles from './TopologyCanvas.module.css'
 
 export interface TopologyCanvasProps {
@@ -37,7 +29,8 @@ export interface TopologyCanvasProps {
   onEdgeDoubleClick?: (edgeId: string) => void
   onConnect?: (source: ConnectionPoint, target: ConnectionPoint) => void
   onCanvasClick?: () => void
-  readonly?: boolean // 子图管理中可能需要只读模式
+  /** 外部传入的 SVG 引用，用于导出功能 */
+  svgRef?: React.RefObject<SVGSVGElement>
 }
 
 /**
@@ -55,9 +48,10 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
   onEdgeDoubleClick,
   onConnect,
   onCanvasClick,
-  readonly = false,
+  svgRef: externalSvgRef,
 }) => {
-  const svgRef = useRef<SVGSVGElement>(null)
+  const internalSvgRef = useRef<SVGSVGElement>(null)
+  const svgRef = externalSvgRef || internalSvgRef
   const containerRef = useRef<HTMLDivElement>(null)
 
   // 节点映射，方便查找
@@ -123,7 +117,6 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
   // ==================== 节点拖拽处理 ====================
 
   const handleNodeMouseDown = useCallback((e: React.MouseEvent, nodeId: string) => {
-    if (readonly) return // 只读模式禁用拖拽
     if (e.button !== 0) return // 只响应左键
     const mousePos = getMousePosition(e)
     const node = nodeMap.get(nodeId)
@@ -138,43 +131,18 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
         y: mousePos.y - node.position.y,
       },
     })
-  }, [readonly, getMousePosition, nodeMap])
-
-  /**
-   * Throttled node move handler
-   * REQ-NFR-003: Throttle drag events to 16ms (60fps)
-   */
-  const throttledNodeMove = useMemo(
-    () => throttle((nodeId: string, position: Position) => {
-      onNodeMove?.(nodeId, position)
-    }, DRAG_THROTTLE_DELAY),
-    [onNodeMove]
-  )
-
-  /**
-   * Debounced position save handler
-   * REQ-NFR-003: Debounce position save to 1000ms
-   */
-  const debouncedPositionSave = useMemo(
-    () => debounce((nodeId: string, position: Position) => {
-      // Save position to localStorage or backend
-      // This is called after drag ends
-      onNodeMove?.(nodeId, position)
-    }, POSITION_SAVE_DEBOUNCE_DELAY),
-    [onNodeMove]
-  )
+  }, [getMousePosition, nodeMap])
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     const mousePos = getMousePosition(e)
 
-    // 处理节点拖拽 - with throttling
+    // 处理节点拖拽
     if (dragState.isDragging && dragState.nodeId) {
       const newPosition = {
         x: mousePos.x - dragState.offset.x,
         y: mousePos.y - dragState.offset.y,
       }
-      // Use throttled move for smooth performance
-      throttledNodeMove(dragState.nodeId, newPosition)
+      onNodeMove?.(dragState.nodeId, newPosition)
     }
 
     // 处理连线拖拽
@@ -204,18 +172,12 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
     connectingState.isConnecting,
     isPanning,
     panStart,
-    throttledNodeMove,
+    onNodeMove,
   ])
 
   const handleMouseUp = useCallback(() => {
     // 结束节点拖拽
-    if (dragState.isDragging && dragState.nodeId) {
-      // Get final position and save with debounce
-      const node = nodeMap.get(dragState.nodeId)
-      if (node) {
-        debouncedPositionSave(dragState.nodeId, node.position)
-      }
-      
+    if (dragState.isDragging) {
       setDragState({
         isDragging: false,
         nodeId: null,
@@ -237,7 +199,7 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
     if (isPanning) {
       setIsPanning(false)
     }
-  }, [dragState.isDragging, dragState.nodeId, connectingState.isConnecting, isPanning, nodeMap, debouncedPositionSave])
+  }, [dragState.isDragging, connectingState.isConnecting, isPanning])
 
   // ==================== 连接点交互处理 ====================
 
@@ -246,7 +208,6 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
     nodeId: string,
     anchor: 'top' | 'bottom'
   ) => {
-    if (readonly) return // 只读模式禁用连线
     const position = getAnchorPosition(nodeId, anchor)
     if (!position) return
 
@@ -255,14 +216,13 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       sourcePoint: { nodeId, anchor, position },
       currentPosition: position,
     })
-  }, [readonly, getAnchorPosition])
+  }, [getAnchorPosition])
 
   const handleAnchorMouseUp = useCallback((
     _: React.MouseEvent,
     nodeId: string,
     anchor: 'top' | 'bottom'
   ) => {
-    if (readonly) return // 只读模式禁用连线
     if (!connectingState.isConnecting || !connectingState.sourcePoint) return
 
     // 不能连接到自己
@@ -291,7 +251,7 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       sourcePoint: null,
       currentPosition: null,
     })
-  }, [readonly, connectingState, getAnchorPosition, onConnect])
+  }, [connectingState, getAnchorPosition, onConnect])
 
   // ==================== 画布交互处理 ====================
 

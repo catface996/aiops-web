@@ -32,6 +32,7 @@ import {
   SearchOutlined,
   DeleteOutlined,
   ExclamationCircleOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { ResourceInfo } from '@/types/subgraph';
@@ -47,7 +48,9 @@ interface ResourceNodesTabProps {
   resources: ResourceInfo[];
   loading: boolean;
   canRemoveNode: boolean;
+  canAddNode: boolean;
   onRefresh: () => void;
+  onAddNode: () => void;
 }
 
 /**
@@ -88,7 +91,9 @@ const ResourceNodesTab: React.FC<ResourceNodesTabProps> = ({
   resources,
   loading,
   canRemoveNode,
+  canAddNode,
   onRefresh,
+  onAddNode,
 }) => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [removing, setRemoving] = useState(false);
@@ -248,8 +253,10 @@ const ResourceNodesTab: React.FC<ResourceNodesTabProps> = ({
           description="此子图暂无资源节点"
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         >
-          {canRemoveNode && (
-            <Button type="primary">添加资源节点</Button>
+          {canAddNode && (
+            <Button type="primary" icon={<PlusOutlined />} onClick={onAddNode}>
+              添加资源
+            </Button>
           )}
         </Empty>
       </div>
@@ -263,19 +270,26 @@ const ResourceNodesTab: React.FC<ResourceNodesTabProps> = ({
 
   return (
     <div style={{ padding: '24px' }}>
-      {/* Search Bar - REQ-FR-026 */}
-      <div style={{ marginBottom: '16px' }}>
-        <Input
-          placeholder="搜索资源节点名称"
-          prefix={<SearchOutlined />}
-          value={searchKeyword}
-          onChange={(e) => setSearchKeyword(e.target.value)}
-          allowClear
-          style={{ width: '300px' }}
-        />
-        <Text type="secondary" style={{ marginLeft: '16px' }}>
-          共 {filteredResources.length} 个资源节点
-        </Text>
+      {/* Search Bar and Add Button - REQ-FR-026 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <div>
+          <Input
+            placeholder="搜索资源节点名称"
+            prefix={<SearchOutlined />}
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            allowClear
+            style={{ width: '300px' }}
+          />
+          <Text type="secondary" style={{ marginLeft: '16px' }}>
+            共 {filteredResources.length} 个资源节点
+          </Text>
+        </div>
+        {canAddNode && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={onAddNode}>
+            添加资源
+          </Button>
+        )}
       </div>
 
       {/* Resource Nodes Table - REQ-FR-025 */}

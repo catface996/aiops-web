@@ -17,17 +17,13 @@
  * REQ-FR-031-D: Export functionality
  */
 
-import React, { useState, useCallback } from 'react';
-import { Button, Space, Select, Tooltip, Spin, message } from 'antd';
-import {
-  DownloadOutlined,
-  PlusOutlined,
-  ReloadOutlined,
-} from '@ant-design/icons';
+import React, { useState, useCallback, useRef } from 'react';
+import { Spin, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { TopologyCanvas } from '@/components/SubgraphManagement/Topology/TopologyCanvas';
+import { TopologyCanvas, TopologyToolbar } from '@/components/Topology';
+import type { LayoutType } from '@/components/Topology';
 import EmptyState from '@/components/EmptyState';
-import type { TopologyData } from '@/types/topology';
+import type { TopologyData, Position } from '@/types/topology';
 
 export interface TopologyTabProps {
   topologyData: TopologyData | null;
@@ -35,13 +31,12 @@ export interface TopologyTabProps {
   onRefresh: () => void;
   onAddNode?: () => void;
   canAddNode?: boolean;
+  onNodeMove?: (nodeId: string, position: Position) => void;
 }
-
-type LayoutType = 'force' | 'hierarchical' | 'circular';
 
 /**
  * TopologyTab Component
- * 
+ *
  * REQ-FR-028: Render topology graph with nodes and relationships
  * REQ-FR-030: Node click highlighting and double-click navigation
  * REQ-FR-031: Zoom and pan interactions
@@ -55,32 +50,18 @@ const TopologyTab: React.FC<TopologyTabProps> = ({
   onRefresh,
   onAddNode,
   canAddNode = false,
+  onNodeMove,
 }) => {
   const navigate = useNavigate();
-  
+
   // Layout preference (REQ-FR-031-C)
   const [layout, setLayout] = useState<LayoutType>('force');
-  
+
   // Selected node for highlighting (REQ-FR-030)
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
-  /**
-   * Handle export to PNG
-   * REQ-FR-031-D: Export topology graph as image
-   */
-  const handleExportPNG = useCallback(() => {
-    // TODO: Implement PNG export in future task
-    message.info('PNG export will be available in a future update');
-  }, []);
-
-  /**
-   * Handle export to SVG
-   * REQ-FR-031-D: Export topology graph as image
-   */
-  const handleExportSVG = useCallback(() => {
-    // TODO: Implement SVG export in future task
-    message.info('SVG export will be available in a future update');
-  }, []);
+  // SVG reference for export
+  const svgRef = useRef<SVGSVGElement>(null);
 
   /**
    * Handle node click - highlight node and show tooltip
@@ -168,61 +149,17 @@ const TopologyTab: React.FC<TopologyTabProps> = ({
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
         }}
       >
-        <Space>
-          {/* Layout Selection - REQ-FR-031-C */}
-          <Tooltip title="选择布局算法">
-            <Select
-              value={layout}
-              onChange={setLayout}
-              style={{ width: 120 }}
-              options={[
-                { label: '力导向布局', value: 'force' },
-                { label: '层次布局', value: 'hierarchical' },
-                { label: '环形布局', value: 'circular' },
-              ]}
-            />
-          </Tooltip>
-
-          {/* Export Options - REQ-FR-031-D */}
-          <Tooltip title="导出为PNG">
-            <Button
-              icon={<DownloadOutlined />}
-              onClick={handleExportPNG}
-            >
-              PNG
-            </Button>
-          </Tooltip>
-
-          <Tooltip title="导出为SVG">
-            <Button
-              icon={<DownloadOutlined />}
-              onClick={handleExportSVG}
-            >
-              SVG
-            </Button>
-          </Tooltip>
-
-          {/* Refresh Button */}
-          <Tooltip title="刷新拓扑图">
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={onRefresh}
-            />
-          </Tooltip>
-
-          {/* Add Node Button */}
-          {canAddNode && (
-            <Tooltip title="添加节点">
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={onAddNode}
-              >
-                添加节点
-              </Button>
-            </Tooltip>
-          )}
-        </Space>
+        <TopologyToolbar
+          layout={layout}
+          onLayoutChange={setLayout}
+          showLayoutSelector={true}
+          showExport={true}
+          onRefresh={onRefresh}
+          addButtonText="添加节点"
+          onAdd={onAddNode}
+          showAddButton={canAddNode}
+          svgRef={svgRef}
+        />
       </div>
 
       {/* No Relationships Message - REQ-FR-031-B */}
@@ -247,14 +184,16 @@ const TopologyTab: React.FC<TopologyTabProps> = ({
       )}
 
       {/* Topology Canvas - REQ-FR-028, REQ-FR-030, REQ-FR-031 */}
+      {/* Using shared TopologyCanvas component from @/components/Topology */}
       <TopologyCanvas
         nodes={topologyData.nodes}
         edges={topologyData.edges}
         selectedNodeId={selectedNodeId}
+        onNodeMove={onNodeMove}
         onNodeClick={handleNodeClick}
         onNodeDoubleClick={handleNodeDoubleClick}
         onCanvasClick={handleCanvasClick}
-        readonly={true} // Subgraph topology is read-only
+        svgRef={svgRef}
       />
     </div>
   );

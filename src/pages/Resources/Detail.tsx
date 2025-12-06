@@ -2,10 +2,9 @@
  * 资源详情页面
  * 需求: REQ-FR-026, REQ-FR-027, REQ-FR-028
  */
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Typography,
-  Breadcrumb,
   Button,
   Space,
   Tabs,
@@ -21,21 +20,26 @@ import {
   Timeline,
   List,
   Avatar,
+  Card,
+  Tooltip,
 } from 'antd'
 import {
+  ArrowLeftOutlined,
   EditOutlined,
   DeleteOutlined,
   SaveOutlined,
   CloseOutlined,
-  HomeOutlined,
+  ReloadOutlined,
+  UserOutlined,
+  MailOutlined,
 } from '@ant-design/icons'
-import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom'
-import { useAuth } from '@/hooks/useAuth'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useResourceDetail } from '@/hooks/useResourceDetail'
 import { ResourceTypeIcon } from '@/components/ResourceTypeIcon'
 import { StatusBadge } from '@/components/StatusBadge'
 import { SensitiveField } from '@/components/SensitiveField'
-import { isResourceOwner, isAdmin } from '@/components/PermissionGuard'
+import { PageContainer } from '@/components'
+import { useResourcePermission } from '@/utils/permission'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { formatDateTime, parseResourceAttributes } from '@/utils/resourceFormat'
 import { stringifyResourceAttributes } from '@/utils/resourceFormat'
@@ -66,7 +70,6 @@ const ResourceDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
-  const { user } = useAuth()
 
   // 解析ID
   const resourceId = id ? parseInt(id, 10) : null
@@ -74,6 +77,9 @@ const ResourceDetailPage: React.FC = () => {
   // 资源详情数据
   const { resource, loading, error, refresh, update, updateStatus, deleteResource } =
     useResourceDetail(resourceId)
+
+  // 使用统一权限工具
+  const { canEdit, canDelete, canViewSensitive } = useResourcePermission(resource)
 
   // 编辑状态
   const [editing, setEditing] = useState(false)
@@ -175,17 +181,6 @@ const ResourceDetailPage: React.FC = () => {
     }
   }
 
-  // 权限检查
-  const canEdit = useCallback(() => {
-    if (!user || !resource) return false
-    return isResourceOwner(resource, user.userId) || isAdmin(user.role)
-  }, [user, resource])
-
-  const canDelete = useCallback(() => {
-    if (!user || !resource) return false
-    return isResourceOwner(resource, user.userId) || isAdmin(user.role)
-  }, [user, resource])
-
   // 加载中
   if (loading && !resource) {
     return (
@@ -279,7 +274,7 @@ const ResourceDetailPage: React.FC = () => {
             </Space>
           </Descriptions.Item>
           <Descriptions.Item label="状态">
-            {canEdit() ? (
+            {canEdit ? (
               <Select
                 value={resource.status}
                 onChange={handleStatusChange}
@@ -429,7 +424,7 @@ const ResourceDetailPage: React.FC = () => {
           return (
             <Descriptions.Item key={field.key} label={field.label}>
               {isSensitive ? (
-                <SensitiveField value={String(value || '')} canView={canEdit()} />
+                <SensitiveField value={String(value || '')} canView={canViewSensitive} />
               ) : value !== undefined && value !== '' ? (
                 String(value)
               ) : (
@@ -452,38 +447,58 @@ const ResourceDetailPage: React.FC = () => {
     const viewers: { id: number; name: string; email: string }[] = []
 
     return (
-      <div>
-        <Title level={5}>Owner</Title>
-        <List
-          dataSource={owners}
-          renderItem={(item) => (
-            <List.Item>
-              <List.Item.Meta
-                avatar={<Avatar>{String(item.name).charAt(0).toUpperCase()}</Avatar>}
-                title={item.name}
-                description={item.email}
-              />
-            </List.Item>
+      <div style={{ display: 'flex', gap: 24 }}>
+        {/* 所有者列 */}
+        <div style={{ flex: 1 }}>
+          <Title level={5}>所有者</Title>
+          {owners.length > 0 ? (
+            <List
+              dataSource={owners}
+              renderItem={(item) => (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={<Avatar icon={<UserOutlined />} style={{ backgroundColor: '#b7eb8f' }} />}
+                    title={item.name}
+                    description={
+                      <Space size={4}>
+                        <MailOutlined />
+                        {item.email}
+                      </Space>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+          ) : (
+            <Empty description="暂无所有者" />
           )}
-        />
+        </div>
 
-        <Title level={5} style={{ marginTop: 24 }}>Viewer</Title>
-        {viewers.length > 0 ? (
-          <List
-            dataSource={viewers}
-            renderItem={(item) => (
-              <List.Item>
-                <List.Item.Meta
-                  avatar={<Avatar>{item.name.charAt(0).toUpperCase()}</Avatar>}
-                  title={item.name}
-                  description={item.email}
-                />
-              </List.Item>
-            )}
-          />
-        ) : (
-          <Empty description="暂无Viewer" />
-        )}
+        {/* 查看者列 */}
+        <div style={{ flex: 1 }}>
+          <Title level={5}>查看者</Title>
+          {viewers.length > 0 ? (
+            <List
+              dataSource={viewers}
+              renderItem={(item) => (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={<Avatar icon={<UserOutlined />} style={{ backgroundColor: '#91caff' }} />}
+                    title={item.name}
+                    description={
+                      <Space size={4}>
+                        <MailOutlined />
+                        {item.email}
+                      </Space>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+          ) : (
+            <Empty description="暂无查看者" />
+          )}
+        </div>
       </div>
     )
   }
@@ -503,104 +518,105 @@ const ResourceDetailPage: React.FC = () => {
     { key: 'permissions', label: TAB_LABELS.permissions, children: renderPermissionsTab() },
   ]
 
-  return (
-    <div data-testid="resource-detail-page" style={{ padding: '24px' }}>
-      {/* 面包屑 */}
-      <Breadcrumb
-        items={[
-          {
-            title: (
-              <Link to="/">
-                <HomeOutlined />
-              </Link>
-            ),
-          },
-          { title: <Link to="/resources">资源管理</Link> },
-          { title: resource.name },
-        ]}
-        style={{ marginBottom: 16 }}
-      />
+  // 返回列表
+  const handleBack = () => {
+    navigate('/resources')
+  }
 
-      {/* 页面标题和操作按钮 */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          marginBottom: 24,
-        }}
-      >
-        <div>
-          <Space align="center">
-            <ResourceTypeIcon type={resource.resourceTypeCode} size={24} />
-            <Title level={2} style={{ margin: 0 }}>
-              {resource.name}
-            </Title>
-            <Tag color={resource.status === 'RUNNING' ? 'green' : 'default'}>
-              {ResourceStatusDisplay[resource.status]}
-            </Tag>
+  return (
+    <PageContainer>
+      <div data-testid="resource-detail-page">
+        {/* 页面标题和操作按钮 */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            marginBottom: 16,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+            <Tooltip title="返回列表">
+              <Button
+                icon={<ArrowLeftOutlined />}
+                onClick={handleBack}
+                style={{ marginTop: 4 }}
+              />
+            </Tooltip>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <ResourceTypeIcon type={resource.resourceTypeCode} size={20} />
+                <Title level={4} style={{ margin: 0 }}>
+                  {resource.name}
+                </Title>
+                <Tag color={resource.status === 'RUNNING' ? 'green' : 'default'}>
+                  {ResourceStatusDisplay[resource.status]}
+                </Tag>
+              </div>
+              <Text type="secondary" style={{ marginTop: 4, display: 'block' }}>
+                {resource.description || '暂无描述'}
+              </Text>
+            </div>
+          </div>
+
+          <Space>
+            {editing ? (
+              <>
+                <Button
+                  icon={<CloseOutlined />}
+                  onClick={handleCancelEdit}
+                  disabled={submitting}
+                >
+                  取消
+                </Button>
+                <Button
+                  type="primary"
+                  icon={<SaveOutlined />}
+                  onClick={handleSaveEdit}
+                  loading={submitting}
+                >
+                  保存
+                </Button>
+              </>
+            ) : (
+              <>
+                <Tooltip title="刷新">
+                  <Button icon={<ReloadOutlined />} onClick={refresh} loading={loading} />
+                </Tooltip>
+                {canEdit && (
+                  <Button icon={<EditOutlined />} onClick={handleEdit}>
+                    编辑
+                  </Button>
+                )}
+                {canDelete && (
+                  <Button
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => setDeleteModalOpen(true)}
+                  >
+                    删除
+                  </Button>
+                )}
+              </>
+            )}
           </Space>
-          <Paragraph type="secondary" style={{ marginTop: 8, marginBottom: 0 }}>
-            {resource.description || '暂无描述'}
-          </Paragraph>
         </div>
 
-        <Space>
-          {editing ? (
-            <>
-              <Button
-                icon={<CloseOutlined />}
-                onClick={handleCancelEdit}
-                disabled={submitting}
-              >
-                取消
-              </Button>
-              <Button
-                type="primary"
-                icon={<SaveOutlined />}
-                onClick={handleSaveEdit}
-                loading={submitting}
-              >
-                保存
-              </Button>
-            </>
-          ) : (
-            <>
-              {canEdit() && (
-                <Button icon={<EditOutlined />} onClick={handleEdit}>
-                  编辑
-                </Button>
-              )}
-              {canDelete() && (
-                <Button
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={() => setDeleteModalOpen(true)}
-                >
-                  删除
-                </Button>
-              )}
-            </>
-          )}
-        </Space>
+        {/* Tab内容 */}
+        <Card variant="borderless">
+          <Tabs activeKey={currentTab} onChange={handleTabChange} items={tabItems} />
+        </Card>
+
+        {/* 删除确认弹窗 */}
+        <DeleteConfirmModal
+          open={deleteModalOpen}
+          resource={resource}
+          onClose={() => setDeleteModalOpen(false)}
+          onConfirm={handleDelete}
+          submitting={submitting}
+        />
       </div>
-
-      {/* Tab内容 */}
-      <Tabs
-        activeKey={currentTab}
-        onChange={handleTabChange}
-        items={tabItems}
-      />
-
-      {/* 删除确认弹窗 */}
-      <DeleteConfirmModal
-        open={deleteModalOpen}
-        resource={resource}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleDelete}
-        submitting={submitting}
-      />
-    </div>
+    </PageContainer>
   )
 }
 

@@ -1,7 +1,6 @@
 /**
- * 拓扑连线组件 - 子图管理专用
- * Feature: F08 - 子图管理拓扑可视化
- * Adapted from: F04 TopologyEdge
+ * 拓扑连线组件
+ * Feature: F04 - 节点间的连线，带流动动画
  */
 import React, { memo, useMemo } from 'react'
 import type { TopologyEdge as TopologyEdgeType, TopologyNode, Position } from '@/types/topology'

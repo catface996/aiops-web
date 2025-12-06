@@ -106,8 +106,8 @@ const AddResourceModal: React.FC<AddResourceModalProps> = ({
       }
 
       const response = await getResourceList(params);
-      setResources(response.items);
-      setTotal(response.total);
+      setResources(response.content || []);
+      setTotal(response.totalElements || 0);
     } catch (error) {
       console.error('Failed to fetch resources:', error);
       message.error('Failed to load resources');

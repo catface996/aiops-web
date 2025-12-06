@@ -15,6 +15,7 @@ import type {
   TopologyData,
   SubgraphPermission,
 } from '@/types/subgraph';
+import type { Position } from '@/types/topology';
 
 /**
  * Hook state interface
@@ -38,6 +39,7 @@ export interface UseSubgraphDetailReturn extends UseSubgraphDetailState {
   fetchResources: () => Promise<void>;
   fetchTopology: () => Promise<void>;
   fetchPermissions: () => Promise<void>;
+  updateNodePosition: (nodeId: string, position: Position) => void;
   refetch: () => Promise<void>;
   refetchAll: () => Promise<void>;
 }
@@ -134,10 +136,8 @@ export function useSubgraphDetail(subgraphId: number): UseSubgraphDetailReturn {
         return;
       }
 
-      // Fetch from API if not in cache
-      // Note: Resources are included in detail response, but we can also fetch separately
-      const detail = await SubgraphService.getSubgraphDetail(subgraphId);
-      const resources = detail.resources || [];
+      // Fetch from dedicated resources API
+      const resources = await SubgraphService.getResources(subgraphId);
 
       // Cache the response
       CacheService.set(cacheKey, resources, CACHE_TTL.RESOURCES);
@@ -155,6 +155,29 @@ export function useSubgraphDetail(subgraphId: number): UseSubgraphDetailReturn {
   }, [subgraphId]);
 
   /**
+   * Apply saved positions from localStorage to topology nodes
+   */
+  const applySavedPositions = useCallback((data: TopologyData): TopologyData => {
+    const storageKey = `subgraph-topology-positions-${subgraphId}`;
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const positions = JSON.parse(saved) as Record<string, Position>;
+        const nodesWithPositions = data.nodes.map((node) => {
+          if (positions[node.id]) {
+            return { ...node, position: positions[node.id] };
+          }
+          return node;
+        });
+        return { ...data, nodes: nodesWithPositions };
+      }
+    } catch (e) {
+      console.error('Failed to load saved positions:', e);
+    }
+    return data;
+  }, [subgraphId]);
+
+  /**
    * Fetch topology data
    * REQ-FR-028: Load topology data for visualization
    * REQ-NFR-029-E: Cache topology data for 2 minutes
@@ -169,9 +192,11 @@ export function useSubgraphDetail(subgraphId: number): UseSubgraphDetailReturn {
       const cachedData = CacheService.get<TopologyData>(cacheKey);
 
       if (cachedData) {
+        // Apply saved positions from localStorage
+        const dataWithPositions = applySavedPositions(cachedData);
         setState((prev) => ({
           ...prev,
-          topologyData: cachedData,
+          topologyData: dataWithPositions,
           topologyLoading: false,
         }));
         return;
@@ -183,9 +208,12 @@ export function useSubgraphDetail(subgraphId: number): UseSubgraphDetailReturn {
       // Cache the response
       CacheService.set(cacheKey, data, CACHE_TTL.TOPOLOGY);
 
+      // Apply saved positions from localStorage
+      const dataWithPositions = applySavedPositions(data);
+
       setState((prev) => ({
         ...prev,
-        topologyData: data,
+        topologyData: dataWithPositions,
         topologyLoading: false,
       }));
     } catch (error) {
@@ -193,7 +221,7 @@ export function useSubgraphDetail(subgraphId: number): UseSubgraphDetailReturn {
       message.error('Failed to load topology data');
       setState((prev) => ({ ...prev, topologyLoading: false }));
     }
-  }, [subgraphId]);
+  }, [subgraphId, applySavedPositions]);
 
   /**
    * Fetch permissions
@@ -223,13 +251,13 @@ export function useSubgraphDetail(subgraphId: number): UseSubgraphDetailReturn {
       // We convert them to SubgraphPermission format
       const detail = await SubgraphService.getSubgraphDetail(subgraphId);
       const permissions: SubgraphPermission[] = [
-        ...detail.owners.map((owner) => ({
+        ...(detail.owners || []).map((owner) => ({
           userId: owner.userId,
           role: 'OWNER' as const,
           grantedAt: detail.createdAt, // Placeholder
           grantedBy: detail.createdBy,
         })),
-        ...detail.viewers.map((viewer) => ({
+        ...(detail.viewers || []).map((viewer) => ({
           userId: viewer.userId,
           role: 'VIEWER' as const,
           grantedAt: detail.createdAt, // Placeholder
@@ -250,6 +278,41 @@ export function useSubgraphDetail(subgraphId: number): UseSubgraphDetailReturn {
       message.error('Failed to load permissions');
       setState((prev) => ({ ...prev, permissionsLoading: false }));
     }
+  }, [subgraphId]);
+
+  /**
+   * Update node position locally
+   * This is for drag-and-drop interactions, positions are stored in localStorage
+   */
+  const updateNodePosition = useCallback((nodeId: string, position: Position) => {
+    setState((prev) => {
+      if (!prev.topologyData) return prev;
+
+      const newNodes = prev.topologyData.nodes.map((node) =>
+        node.id === nodeId ? { ...node, position } : node
+      );
+
+      const newTopologyData = {
+        ...prev.topologyData,
+        nodes: newNodes,
+      };
+
+      // Save position to localStorage for persistence
+      const storageKey = `subgraph-topology-positions-${subgraphId}`;
+      try {
+        const saved = localStorage.getItem(storageKey);
+        const positions = saved ? JSON.parse(saved) : {};
+        positions[nodeId] = position;
+        localStorage.setItem(storageKey, JSON.stringify(positions));
+      } catch (e) {
+        console.error('Failed to save node position:', e);
+      }
+
+      return {
+        ...prev,
+        topologyData: newTopologyData,
+      };
+    });
   }, [subgraphId]);
 
   /**
@@ -299,6 +362,7 @@ export function useSubgraphDetail(subgraphId: number): UseSubgraphDetailReturn {
     fetchResources,
     fetchTopology,
     fetchPermissions,
+    updateNodePosition,
     refetch,
     refetchAll,
   };

@@ -2,7 +2,7 @@
  * 拓扑页面
  * Feature: F04 - 建立资源间的拓扑关系
  */
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { Card, Button, Space, message, Spin, Empty, Tooltip, Popconfirm } from 'antd'
 import {
   PlusOutlined,
@@ -18,6 +18,8 @@ import type {
 } from '@/types/topology'
 import { TopologyCanvas, RelationModal } from './components'
 import type { RelationFormData } from './components'
+import { TopologyToolbar } from '@/components/Topology'
+import type { LayoutType } from '@/components/Topology'
 import {
   getRelationshipList,
   createRelationship,
@@ -50,6 +52,10 @@ const TopologyPage: React.FC = () => {
   const [connectTargetNode, setConnectTargetNode] = useState<TopologyNodeType | null>(null)
   const [editingEdge, setEditingEdge] = useState<TopologyEdgeType | null>(null)
   const [modalLoading, setModalLoading] = useState(false)
+
+  // 布局和SVG引用
+  const [layout, setLayout] = useState<LayoutType>('force')
+  const svgRef = useRef<SVGSVGElement>(null)
 
   // 保存节点位置到 localStorage
   const saveNodePositions = useCallback((nodeList: TopologyNodeType[]) => {
@@ -316,39 +322,39 @@ const TopologyPage: React.FC = () => {
         title="拓扑关系图"
         className={styles.card}
         extra={
-          <Space>
-            <Tooltip title="添加关系">
-              <Button
-                icon={<PlusOutlined />}
-                onClick={handleAddRelation}
-              >
-                添加关系
-              </Button>
-            </Tooltip>
-            {selectedEdgeId && (
-              <>
-                <Tooltip title="编辑关系">
-                  <Button
-                    icon={<EditOutlined />}
-                    onClick={() => handleEdgeDoubleClick(selectedEdgeId)}
-                  />
-                </Tooltip>
-                <Popconfirm
-                  title="确定删除该关系吗？"
-                  onConfirm={handleDeleteEdge}
-                  okText="确定"
-                  cancelText="取消"
-                >
-                  <Tooltip title="删除关系">
-                    <Button icon={<DeleteOutlined />} danger />
+          <TopologyToolbar
+            layout={layout}
+            onLayoutChange={setLayout}
+            showLayoutSelector={true}
+            showExport={true}
+            onRefresh={loadData}
+            addButtonText="添加关系"
+            onAdd={handleAddRelation}
+            showAddButton={true}
+            svgRef={svgRef}
+            extraContent={
+              selectedEdgeId && (
+                <Space>
+                  <Tooltip title="编辑关系">
+                    <Button
+                      icon={<EditOutlined />}
+                      onClick={() => handleEdgeDoubleClick(selectedEdgeId)}
+                    />
                   </Tooltip>
-                </Popconfirm>
-              </>
-            )}
-            <Tooltip title="刷新">
-              <Button icon={<ReloadOutlined />} onClick={loadData} />
-            </Tooltip>
-          </Space>
+                  <Popconfirm
+                    title="确定删除该关系吗？"
+                    onConfirm={handleDeleteEdge}
+                    okText="确定"
+                    cancelText="取消"
+                  >
+                    <Tooltip title="删除关系">
+                      <Button icon={<DeleteOutlined />} danger />
+                    </Tooltip>
+                  </Popconfirm>
+                </Space>
+              )
+            }
+          />
         }
       >
         <Spin spinning={loading}>
@@ -368,6 +374,7 @@ const TopologyPage: React.FC = () => {
                 onEdgeDoubleClick={handleEdgeDoubleClick}
                 onConnect={handleConnect}
                 onCanvasClick={handleCanvasClick}
+                svgRef={svgRef}
               />
             </div>
           )}

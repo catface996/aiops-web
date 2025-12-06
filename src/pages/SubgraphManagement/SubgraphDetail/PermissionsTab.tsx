@@ -18,7 +18,6 @@
 
 import React, { useState } from 'react';
 import {
-  Card,
   List,
   Avatar,
   Button,
@@ -60,13 +59,17 @@ interface PermissionsTabProps {
  */
 const PermissionsTab: React.FC<PermissionsTabProps> = ({
   subgraphId,
-  owners,
-  viewers,
+  owners: ownersProps,
+  viewers: viewersProps,
   loading,
   canManagePermissions,
   currentUserId,
   onRefresh,
 }) => {
+  // Ensure arrays are never undefined
+  const owners = ownersProps || [];
+  const viewers = viewersProps || [];
+
   const [addOwnerModalVisible, setAddOwnerModalVisible] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searchResults, setSearchResults] = useState<SubgraphUserInfo[]>([]);
@@ -239,12 +242,10 @@ const PermissionsTab: React.FC<PermissionsTabProps> = ({
         }
       >
         <List.Item.Meta
-          avatar={
-            <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
-          }
+          avatar={<Avatar icon={<UserOutlined />} style={{ backgroundColor: '#b7eb8f' }} />}
           title={
-            <Space>
-              <Text strong>{owner.username}</Text>
+            <Space size={4}>
+              {owner.username}
               {isCurrentUser && (
                 <Text type="secondary" style={{ fontSize: '12px' }}>
                   (当前用户)
@@ -253,9 +254,9 @@ const PermissionsTab: React.FC<PermissionsTabProps> = ({
             </Space>
           }
           description={
-            <Space>
+            <Space size={4}>
               <MailOutlined />
-              <Text type="secondary">{owner.email}</Text>
+              {owner.email}
             </Space>
           }
         />
@@ -270,14 +271,12 @@ const PermissionsTab: React.FC<PermissionsTabProps> = ({
     return (
       <List.Item>
         <List.Item.Meta
-          avatar={
-            <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#52c41a' }} />
-          }
-          title={<Text strong>{viewer.username}</Text>}
+          avatar={<Avatar icon={<UserOutlined />} style={{ backgroundColor: '#91caff' }} />}
+          title={viewer.username}
           description={
-            <Space>
+            <Space size={4}>
               <MailOutlined />
-              <Text type="secondary">{viewer.email}</Text>
+              {viewer.email}
             </Space>
           }
         />
@@ -294,22 +293,13 @@ const PermissionsTab: React.FC<PermissionsTabProps> = ({
   }
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+    <div>
+      <div style={{ display: 'flex', gap: 24 }}>
         {/* Owner Section - REQ-FR-032 */}
-        <Card
-          title={
-            <Space>
-              <Title level={5} style={{ margin: 0 }}>
-                所有者 ({owners.length})
-              </Title>
-              <Text type="secondary" style={{ fontSize: '14px', fontWeight: 'normal' }}>
-                拥有完全控制权限
-              </Text>
-            </Space>
-          }
-          extra={
-            canManagePermissions && (
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <Title level={5} style={{ margin: 0 }}>所有者</Title>
+            {canManagePermissions && (
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
@@ -317,50 +307,31 @@ const PermissionsTab: React.FC<PermissionsTabProps> = ({
               >
                 添加所有者
               </Button>
-            )
-          }
-        >
+            )}
+          </div>
           {owners.length === 0 ? (
-            <Empty
-              description="暂无所有者"
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-            />
+            <Empty description="暂无所有者" />
           ) : (
             <List
               dataSource={owners}
               renderItem={renderOwnerItem}
-              split
             />
           )}
-        </Card>
+        </div>
 
         {/* Viewer Section - REQ-FR-032 */}
-        <Card
-          title={
-            <Space>
-              <Title level={5} style={{ margin: 0 }}>
-                查看者 ({viewers.length})
-              </Title>
-              <Text type="secondary" style={{ fontSize: '14px', fontWeight: 'normal' }}>
-                只有查看权限
-              </Text>
-            </Space>
-          }
-        >
+        <div style={{ flex: 1 }}>
+          <Title level={5}>查看者</Title>
           {viewers.length === 0 ? (
-            <Empty
-              description="暂无查看者"
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-            />
+            <Empty description="暂无查看者" />
           ) : (
             <List
               dataSource={viewers}
               renderItem={renderViewerItem}
-              split
             />
           )}
-        </Card>
-      </Space>
+        </div>
+      </div>
 
       {/* Add Owner Modal - REQ-FR-040 */}
       <Modal
@@ -373,7 +344,7 @@ const PermissionsTab: React.FC<PermissionsTabProps> = ({
         cancelText="取消"
         width={600}
       >
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <Text type="secondary">
             搜索用户并添加为所有者。所有者拥有编辑、删除子图和管理资源节点的权限。
           </Text>
@@ -420,17 +391,10 @@ const PermissionsTab: React.FC<PermissionsTabProps> = ({
                     }}
                   >
                     <List.Item.Meta
-                      avatar={
-                        <Avatar
-                          icon={<UserOutlined />}
-                          style={{
-                            backgroundColor: isAlreadyOwner ? '#d9d9d9' : '#1890ff',
-                          }}
-                        />
-                      }
+                      avatar={<Avatar icon={<UserOutlined />} />}
                       title={
-                        <Space>
-                          <Text strong={!isAlreadyOwner}>{user.username}</Text>
+                        <Space size={4}>
+                          {user.username}
                           {isAlreadyOwner && (
                             <Text type="secondary" style={{ fontSize: '12px' }}>
                               (已是所有者)
@@ -439,9 +403,9 @@ const PermissionsTab: React.FC<PermissionsTabProps> = ({
                         </Space>
                       }
                       description={
-                        <Space>
+                        <Space size={4}>
                           <MailOutlined />
-                          <Text type="secondary">{user.email}</Text>
+                          {user.email}
                         </Space>
                       }
                     />
@@ -450,7 +414,7 @@ const PermissionsTab: React.FC<PermissionsTabProps> = ({
               }}
             />
           )}
-        </Space>
+        </div>
       </Modal>
     </div>
   );

@@ -1,15 +1,14 @@
 /**
  * Subgraph Detail Page
- * 
+ *
  * This page displays detailed information about a subgraph with tabs.
- * 
+ *
  * Features:
- * - Breadcrumb navigation
  * - Page header with action buttons
  * - Tabbed content area (Overview, Resources, Topology, Permissions)
  * - Tab switching with URL synchronization
- * 
- * REQ-FR-021: Detail page layout with breadcrumb, header, and tabs
+ *
+ * REQ-FR-021: Detail page layout with header and tabs
  * REQ-FR-022: Four tabs (Overview, Resource Nodes, Topology, Permissions)
  * REQ-FR-023: Tab URL synchronization (?tab=xxx)
  */
@@ -17,7 +16,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  Breadcrumb,
   Card,
   Tabs,
   Button,
@@ -28,21 +26,22 @@ import {
   Tooltip,
 } from 'antd';
 import {
-  HomeOutlined,
+  ArrowLeftOutlined,
   EditOutlined,
   DeleteOutlined,
-  PlusOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
 import { useSubgraphDetail } from '@/hooks/subgraph/useSubgraphDetail';
-import { useSubgraphPermission } from '@/hooks/subgraph/useSubgraphPermission';
+import { useSubgraphPermission } from '@/utils/permission';
 import { useAuth } from '@/hooks/useAuth';
+import { PageContainer } from '@/components';
+import AddResourceModal from '@/components/SubgraphManagement/AddResourceModal';
 import OverviewTab from './OverviewTab';
 import TopologyTab from './TopologyTab';
 import ResourceNodesTab from './ResourceNodesTab';
 import PermissionsTab from './PermissionsTab';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 /**
  * Tab key type
@@ -90,14 +89,17 @@ const SubgraphDetail: React.FC = () => {
     fetchResources,
     fetchTopology,
     fetchPermissions,
+    updateNodePosition,
     refetch,
   } = useSubgraphDetail(subgraphId);
 
   // Use permission hook for access control
   const { canEdit, canDelete, canAddNode, canRemoveNode } = useSubgraphPermission(
-    subgraphId,
     subgraph
   );
+
+  // Add resource modal state
+  const [addResourceModalVisible, setAddResourceModalVisible] = useState(false);
 
   /**
    * Handle tab change
@@ -140,36 +142,57 @@ const SubgraphDetail: React.FC = () => {
 
   /**
    * Handle add node button click
-   * TODO: Will be implemented in Task 24
+   * Opens the add resource modal
    */
   const handleAddNode = () => {
-    console.log('Add node to subgraph:', subgraphId);
-    // TODO: Open add resource modal
+    setAddResourceModalVisible(true);
   };
 
   /**
-   * Handle breadcrumb navigation
+   * Handle add resource modal close
    */
-  const handleBreadcrumbClick = (path: string) => {
-    navigate(path);
+  const handleAddResourceModalClose = () => {
+    setAddResourceModalVisible(false);
   };
 
   /**
-   * Sync URL tab parameter with state on mount
+   * Handle add resource success
+   */
+  const handleAddResourceSuccess = () => {
+    setAddResourceModalVisible(false);
+    // Refresh resources list
+    fetchResources();
+    // Also refresh the main detail to update resource count
+    refetch();
+  };
+
+  /**
+   * Handle back button click
+   */
+  const handleBack = () => {
+    navigate('/subgraphs');
+  };
+
+  /**
+   * Load data for the active tab on mount or when tab changes via URL
    * REQ-FR-023: Support direct access to specific tabs via URL
    */
   useEffect(() => {
+    // Sync activeTab with URL parameter
     if (urlTab && urlTab !== activeTab) {
       setActiveTab(urlTab);
+    }
 
-      // Lazy load data for the active tab
-      if (urlTab === 'resources' && resources.length === 0) {
-        fetchResources();
-      } else if (urlTab === 'topology' && !topologyData) {
-        fetchTopology();
-      } else if (urlTab === 'permissions' && permissions.length === 0) {
-        fetchPermissions();
-      }
+    // Determine which tab to load data for
+    const currentTab = urlTab || activeTab;
+
+    // Lazy load data for the current tab
+    if (currentTab === 'resources' && resources.length === 0) {
+      fetchResources();
+    } else if (currentTab === 'topology' && !topologyData) {
+      fetchTopology();
+    } else if (currentTab === 'permissions' && permissions.length === 0) {
+      fetchPermissions();
     }
   }, [urlTab, activeTab, resources.length, topologyData, permissions.length, fetchResources, fetchTopology, fetchPermissions]);
 
@@ -224,7 +247,9 @@ const SubgraphDetail: React.FC = () => {
           resources={resources}
           loading={resourcesLoading}
           canRemoveNode={canRemoveNode}
+          canAddNode={canAddNode}
           onRefresh={fetchResources}
+          onAddNode={handleAddNode}
         />
       ),
     },
@@ -238,12 +263,13 @@ const SubgraphDetail: React.FC = () => {
           onRefresh={fetchTopology}
           onAddNode={handleAddNode}
           canAddNode={canAddNode}
+          onNodeMove={updateNodePosition}
         />
       ),
     },
     {
       key: 'permissions',
-      label: '权限管理',
+      label: '权限',
       children: (
         <PermissionsTab
           subgraphId={subgraphId}
@@ -259,112 +285,77 @@ const SubgraphDetail: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '24px', background: '#f0f2f5', minHeight: '100vh' }}>
-      {/* Breadcrumb Navigation - REQ-FR-021 */}
-      <Breadcrumb
-        style={{ marginBottom: '16px' }}
-        items={[
-          {
-            title: (
-              <a onClick={() => handleBreadcrumbClick('/dashboard')}>
-                <HomeOutlined />
-              </a>
-            ),
-          },
-          {
-            title: (
-              <a onClick={() => handleBreadcrumbClick('/subgraphs')}>
-                子图管理
-              </a>
-            ),
-          },
-          {
-            title: subgraph.name,
-          },
-        ]}
-      />
-
-      {/* Page Header - REQ-FR-021 */}
-      <Card
-        bordered={false}
-        style={{ marginBottom: '16px' }}
+    <PageContainer>
+      {/* Page Header */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '16px',
+        }}
       >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+          <Tooltip title="返回列表">
+            <Button
+              icon={<ArrowLeftOutlined />}
+              onClick={handleBack}
+              style={{ marginTop: '4px' }}
+            />
+          </Tooltip>
           <div>
-            <Title level={3} style={{ margin: 0, marginBottom: '8px' }}>
+            <Title level={4} style={{ margin: 0, marginBottom: '4px' }}>
               {subgraph.name}
             </Title>
             {subgraph.description && (
-              <Typography.Text type="secondary">
-                {subgraph.description}
-              </Typography.Text>
+              <Text type="secondary">{subgraph.description}</Text>
             )}
           </div>
-
-          {/* Action Buttons - REQ-FR-021 */}
-          <Space>
-            <Tooltip title="刷新">
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={refetch}
-                loading={loading}
-              />
-            </Tooltip>
-
-            {canEdit && (
-              <Tooltip title="编辑子图">
-                <Button
-                  icon={<EditOutlined />}
-                  onClick={handleEdit}
-                >
-                  编辑
-                </Button>
-              </Tooltip>
-            )}
-
-            {canAddNode && (
-              <Tooltip title="添加资源节点">
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={handleAddNode}
-                >
-                  添加节点
-                </Button>
-              </Tooltip>
-            )}
-
-            {canDelete && (
-              <Tooltip title="删除子图">
-                <Button
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={handleDelete}
-                >
-                  删除
-                </Button>
-              </Tooltip>
-            )}
-          </Space>
         </div>
-      </Card>
+
+        {/* Action Buttons */}
+        <Space>
+          <Tooltip title="刷新">
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={refetch}
+              loading={loading}
+            />
+          </Tooltip>
+
+          {canEdit && (
+            <Button icon={<EditOutlined />} onClick={handleEdit}>
+              编辑
+            </Button>
+          )}
+
+          {canDelete && (
+            <Button danger icon={<DeleteOutlined />} onClick={handleDelete}>
+              删除
+            </Button>
+          )}
+        </Space>
+      </div>
 
       {/* Tabbed Content Area - REQ-FR-022 */}
-      <Card bordered={false}>
+      <Card variant="borderless">
         <Tabs
           activeKey={activeTab}
           onChange={handleTabChange}
           items={tabItems}
-          destroyInactiveTabPane={false}
+          destroyOnHidden={false}
         />
       </Card>
-    </div>
+
+      {/* Add Resource Modal */}
+      <AddResourceModal
+        visible={addResourceModalVisible}
+        subgraphId={subgraphId}
+        existingResourceIds={resources.map((r) => r.resourceId)}
+        onClose={handleAddResourceModalClose}
+        onSuccess={handleAddResourceSuccess}
+      />
+    </PageContainer>
   );
 };
 

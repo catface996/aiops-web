@@ -1,5 +1,5 @@
 /**
- * 拓扑节点样式 - 子图管理专用
+ * 拓扑节点样式
  */
 
 .nodeGroup {
@@ -26,12 +26,6 @@
   stroke: #1890ff;
   stroke-width: 2px;
   filter: drop-shadow(0 0 8px rgba(24, 144, 255, 0.4));
-}
-
-.nodeRect.hovered {
-  stroke: #40a9ff;
-  stroke-width: 2px;
-  filter: drop-shadow(0 2px 6px rgba(24, 144, 255, 0.25));
 }
 
 .nodeContent {

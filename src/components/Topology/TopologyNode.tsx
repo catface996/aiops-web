@@ -1,12 +1,8 @@
 /**
- * 拓扑节点组件 - 子图管理专用
- * Feature: F08 - 子图管理拓扑可视化
- * Adapted from: F04 TopologyNode
- * 
- * REQ-FR-030: Node click highlighting and tooltip display
- * REQ-NFR-025: Smooth interaction with visual feedback
+ * 拓扑节点组件
+ * Feature: F04 - 可拖拽的资源节点，圆角矩形，上下各有连接点
  */
-import React, { useCallback, memo, useState } from 'react'
+import React, { useCallback, memo } from 'react'
 import { Tooltip } from 'antd'
 import {
   DatabaseOutlined,
@@ -68,9 +64,6 @@ export const TopologyNode: React.FC<TopologyNodeProps> = memo(({
   const { WIDTH, HEIGHT, BORDER_RADIUS, ANCHOR_RADIUS } = NODE_CONSTANTS
   const statusColor = statusColorMap[node.status] || '#d9d9d9'
   const icon = typeIconMap[node.typeCode] || <AppstoreOutlined />
-  
-  // Hover state for tooltip (REQ-FR-030)
-  const [isHovered, setIsHovered] = useState(false)
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
@@ -86,14 +79,6 @@ export const TopologyNode: React.FC<TopologyNodeProps> = memo(({
     e.stopPropagation()
     onDoubleClick?.(node.id)
   }, [node.id, onDoubleClick])
-  
-  const handleMouseEnter = useCallback(() => {
-    setIsHovered(true)
-  }, [])
-  
-  const handleMouseLeave = useCallback(() => {
-    setIsHovered(false)
-  }, [])
 
   const handleAnchorMouseDown = useCallback((e: React.MouseEvent, anchor: 'top' | 'bottom') => {
     e.stopPropagation()
@@ -106,50 +91,28 @@ export const TopologyNode: React.FC<TopologyNodeProps> = memo(({
     onAnchorMouseUp?.(e, node.id, anchor)
   }, [node.id, onAnchorMouseUp])
 
-  // Tooltip content (REQ-FR-030)
-  const tooltipContent = (
-    <div style={{ padding: '4px 0' }}>
-      <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{node.name}</div>
-      <div style={{ fontSize: '12px', opacity: 0.85 }}>
-        <div>Type: {node.type}</div>
-        <div>Status: {node.status}</div>
-        <div style={{ marginTop: '4px', fontSize: '11px', opacity: 0.7 }}>
-          Double-click to view details
-        </div>
-      </div>
-    </div>
-  )
-
   return (
-    <Tooltip
-      title={tooltipContent}
-      placement="top"
-      open={isHovered || selected}
-      mouseEnterDelay={0.3}
+    <g
+      transform={`translate(${node.position.x}, ${node.position.y})`}
+      className={styles.nodeGroup}
+      data-node-id={node.id}
     >
-      <g
-        transform={`translate(${node.position.x}, ${node.position.y})`}
-        className={styles.nodeGroup}
-        data-node-id={node.id}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        {/* 节点主体 - 圆角矩形 */}
-        <rect
-          x={0}
-          y={0}
-          width={WIDTH}
-          height={HEIGHT}
-          rx={BORDER_RADIUS}
-          ry={BORDER_RADIUS}
-          className={`${styles.nodeRect} ${selected ? styles.selected : ''} ${isHovered ? styles.hovered : ''}`}
-          onMouseDown={handleMouseDown}
-          onClick={handleClick}
-          onDoubleClick={handleDoubleClick}
-          style={{
-            cursor: 'move',
-          }}
-        />
+      {/* 节点主体 - 圆角矩形 */}
+      <rect
+        x={0}
+        y={0}
+        width={WIDTH}
+        height={HEIGHT}
+        rx={BORDER_RADIUS}
+        ry={BORDER_RADIUS}
+        className={`${styles.nodeRect} ${selected ? styles.selected : ''}`}
+        onMouseDown={handleMouseDown}
+        onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
+        style={{
+          cursor: 'move',
+        }}
+      />
 
       {/* 状态指示条 */}
       <rect
@@ -204,8 +167,7 @@ export const TopologyNode: React.FC<TopologyNodeProps> = memo(({
         onMouseUp={(e) => handleAnchorMouseUp(e, 'bottom')}
         data-anchor="bottom"
       />
-      </g>
-    </Tooltip>
+    </g>
   )
 })
 

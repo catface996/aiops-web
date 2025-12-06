@@ -13,7 +13,7 @@
  */
 
 import React from 'react';
-import { Descriptions, Tag, Typography, Space, Card, Row, Col, Statistic } from 'antd';
+import { Descriptions, Tag, Typography, Row, Col, Statistic } from 'antd';
 import {
   UserOutlined,
   ClusterOutlined,
@@ -57,45 +57,41 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ subgraph }) => {
   const viewers = subgraph.viewers || [];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        {/* Statistics Cards */}
-        <Row gutter={16}>
-          <Col span={8}>
-            <Card>
-              <Statistic
-                title="所有者数量"
-                value={owners.length}
-                prefix={<UserOutlined />}
-                valueStyle={{ color: '#1890ff' }}
-              />
-            </Card>
-          </Col>
-          <Col span={8}>
-            <Card>
-              <Statistic
-                title="查看者数量"
-                value={viewers.length}
-                prefix={<UserOutlined />}
-                valueStyle={{ color: '#52c41a' }}
-              />
-            </Card>
-          </Col>
-          <Col span={8}>
-            <Card>
-              <Statistic
-                title="资源节点数量"
-                value={subgraph.resourceCount}
-                prefix={<ClusterOutlined />}
-                valueStyle={{ color: '#faad14' }}
-              />
-            </Card>
-          </Col>
-        </Row>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Statistics Cards */}
+      <Row gutter={16}>
+        <Col span={8}>
+          <Statistic
+            title="所有者数量"
+            value={owners.length}
+            prefix={<UserOutlined />}
+            styles={{ content: { color: '#1890ff' } }}
+          />
+        </Col>
+        <Col span={8}>
+          <Statistic
+            title="查看者数量"
+            value={viewers.length}
+            prefix={<UserOutlined />}
+            styles={{ content: { color: '#52c41a' } }}
+          />
+        </Col>
+        <Col span={8}>
+          <Statistic
+            title="资源节点数量"
+            value={subgraph.resourceCount}
+            prefix={<ClusterOutlined />}
+            styles={{ content: { color: '#faad14' } }}
+          />
+        </Col>
+      </Row>
 
-        {/* Basic Information */}
-        <Card title="基本信息" size="small">
-          <Descriptions column={1} bordered>
+      {/* Basic Information */}
+      <div>
+        <Typography.Title level={5} style={{ marginBottom: '12px' }}>
+          基本信息
+        </Typography.Title>
+        <Descriptions column={1} bordered size="small">
             <Descriptions.Item label="子图名称">
               <Text strong>{subgraph.name}</Text>
             </Descriptions.Item>
@@ -112,13 +108,13 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ subgraph }) => {
 
             <Descriptions.Item label="标签">
               {subgraph.tags && subgraph.tags.length > 0 ? (
-                <Space wrap>
+                <span style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                   {subgraph.tags.map((tag) => (
                     <Tag key={tag} color="blue">
                       {tag}
                     </Tag>
                   ))}
-                </Space>
+                </span>
               ) : (
                 <Text type="secondary">无标签</Text>
               )}
@@ -128,139 +124,148 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ subgraph }) => {
               <Text code>{subgraph.version}</Text>
             </Descriptions.Item>
           </Descriptions>
-        </Card>
+      </div>
 
-        {/* Metadata */}
-        <Card title="元数据" size="small">
-          <Descriptions column={1} bordered>
-            <Descriptions.Item label="业务域">
-              {subgraph.metadata?.businessDomain ? (
-                <Tag color="purple">{subgraph.metadata.businessDomain}</Tag>
-              ) : (
-                <Text type="secondary">未设置</Text>
-              )}
-            </Descriptions.Item>
+      {/* Metadata */}
+      <div>
+        <Typography.Title level={5} style={{ marginBottom: '12px' }}>
+          元数据
+        </Typography.Title>
+        <Descriptions column={1} bordered size="small">
+          <Descriptions.Item label="业务域">
+            {subgraph.metadata?.businessDomain ? (
+              <Tag color="purple">{subgraph.metadata.businessDomain}</Tag>
+            ) : (
+              <Text type="secondary">未设置</Text>
+            )}
+          </Descriptions.Item>
 
-            <Descriptions.Item label="环境">
-              {subgraph.metadata?.environment ? (
-                <Tag color="green">{subgraph.metadata.environment}</Tag>
-              ) : (
-                <Text type="secondary">未设置</Text>
-              )}
-            </Descriptions.Item>
+          <Descriptions.Item label="环境">
+            {subgraph.metadata?.environment ? (
+              <Tag color="green">{subgraph.metadata.environment}</Tag>
+            ) : (
+              <Text type="secondary">未设置</Text>
+            )}
+          </Descriptions.Item>
 
-            <Descriptions.Item label="团队">
-              {subgraph.metadata?.team ? (
-                <Tag color="orange">{subgraph.metadata.team}</Tag>
-              ) : (
-                <Text type="secondary">未设置</Text>
-              )}
-            </Descriptions.Item>
+          <Descriptions.Item label="团队">
+            {subgraph.metadata?.team ? (
+              <Tag color="orange">{subgraph.metadata.team}</Tag>
+            ) : (
+              <Text type="secondary">未设置</Text>
+            )}
+          </Descriptions.Item>
 
-            {/* Display other metadata fields if present */}
-            {subgraph.metadata &&
-              Object.entries(subgraph.metadata)
-                .filter(
-                  ([key]) =>
-                    !['businessDomain', 'environment', 'team'].includes(key)
-                )
-                .map(([key, value]) => (
-                  <Descriptions.Item key={key} label={key}>
-                    <Text>{value}</Text>
-                  </Descriptions.Item>
-                ))}
-          </Descriptions>
-        </Card>
-
-        {/* Timestamps and Creator */}
-        <Card title="时间信息" size="small">
-          <Descriptions column={2} bordered>
-            <Descriptions.Item
-              label={
-                <Space>
-                  <CalendarOutlined />
-                  <span>创建时间</span>
-                </Space>
-              }
-            >
-              <Text>{formatDate(subgraph.createdAt)}</Text>
-            </Descriptions.Item>
-
-            <Descriptions.Item label="创建者">
-              <Text>
-                用户 ID: <Text code>{subgraph.createdBy}</Text>
-              </Text>
-            </Descriptions.Item>
-
-            <Descriptions.Item
-              label={
-                <Space>
-                  <EditOutlined />
-                  <span>更新时间</span>
-                </Space>
-              }
-            >
-              <Text>{formatDate(subgraph.updatedAt)}</Text>
-            </Descriptions.Item>
-
-            <Descriptions.Item label="更新次数">
-              <Text>
-                {subgraph.version > 1 ? (
-                  <Text type="success">{subgraph.version - 1} 次</Text>
-                ) : (
-                  <Text type="secondary">未更新</Text>
-                )}
-              </Text>
-            </Descriptions.Item>
-          </Descriptions>
-        </Card>
-
-        {/* Owners List */}
-        <Card title="所有者列表" size="small">
-          {owners.length > 0 ? (
-            <Descriptions column={1} bordered>
-              {owners.map((owner, index) => (
-                <Descriptions.Item
-                  key={owner.userId}
-                  label={`所有者 ${index + 1}`}
-                >
-                  <Space>
-                    <UserOutlined />
-                    <Text strong>{owner.username}</Text>
-                    <Text type="secondary">({owner.email})</Text>
-                    <Text type="secondary">ID: {owner.userId}</Text>
-                  </Space>
+          {/* Display other metadata fields if present */}
+          {subgraph.metadata &&
+            Object.entries(subgraph.metadata)
+              .filter(
+                ([key]) =>
+                  !['businessDomain', 'environment', 'team'].includes(key)
+              )
+              .map(([key, value]) => (
+                <Descriptions.Item key={key} label={key}>
+                  <Text>{value}</Text>
                 </Descriptions.Item>
               ))}
-            </Descriptions>
-          ) : (
-            <Text type="secondary">无所有者</Text>
-          )}
-        </Card>
+        </Descriptions>
+      </div>
 
-        {/* Viewers List */}
-        <Card title="查看者列表" size="small">
-          {viewers.length > 0 ? (
-            <Descriptions column={1} bordered>
-              {viewers.map((viewer, index) => (
-                <Descriptions.Item
-                  key={viewer.userId}
-                  label={`查看者 ${index + 1}`}
-                >
-                  <Space>
-                    <UserOutlined />
-                    <Text>{viewer.username}</Text>
-                    <Text type="secondary">({viewer.email})</Text>
-                    <Text type="secondary">ID: {viewer.userId}</Text>
-                  </Space>
-                </Descriptions.Item>
-              ))}
-            </Descriptions>
-          ) : (
-            <Text type="secondary">无查看者</Text>
-          )}
-        </Card>
-      </Space>
+      {/* Timestamps and Creator */}
+      <div>
+        <Typography.Title level={5} style={{ marginBottom: '12px' }}>
+          时间信息
+        </Typography.Title>
+        <Descriptions column={2} bordered size="small">
+          <Descriptions.Item
+            label={
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <CalendarOutlined />
+                <span>创建时间</span>
+              </span>
+            }
+          >
+            <Text>{formatDate(subgraph.createdAt)}</Text>
+          </Descriptions.Item>
+
+          <Descriptions.Item label="创建者">
+            <Text>
+              用户 ID: <Text code>{subgraph.createdBy}</Text>
+            </Text>
+          </Descriptions.Item>
+
+          <Descriptions.Item
+            label={
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <EditOutlined />
+                <span>更新时间</span>
+              </span>
+            }
+          >
+            <Text>{formatDate(subgraph.updatedAt)}</Text>
+          </Descriptions.Item>
+
+          <Descriptions.Item label="更新次数">
+            {subgraph.version > 1 ? (
+              <Text type="success">{subgraph.version - 1} 次</Text>
+            ) : (
+              <Text type="secondary">未更新</Text>
+            )}
+          </Descriptions.Item>
+        </Descriptions>
+      </div>
+
+      {/* Owners List */}
+      <div>
+        <Typography.Title level={5} style={{ marginBottom: '12px' }}>
+          所有者列表
+        </Typography.Title>
+        {owners.length > 0 ? (
+          <Descriptions column={1} bordered size="small">
+            {owners.map((owner, index) => (
+              <Descriptions.Item
+                key={owner.userId}
+                label={`所有者 ${index + 1}`}
+              >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <UserOutlined />
+                  <Text strong>{owner.username}</Text>
+                  <Text type="secondary">({owner.email})</Text>
+                  <Text type="secondary">ID: {owner.userId}</Text>
+                </span>
+              </Descriptions.Item>
+            ))}
+          </Descriptions>
+        ) : (
+          <Text type="secondary">无所有者</Text>
+        )}
+      </div>
+
+      {/* Viewers List */}
+      <div>
+        <Typography.Title level={5} style={{ marginBottom: '12px' }}>
+          查看者列表
+        </Typography.Title>
+        {viewers.length > 0 ? (
+          <Descriptions column={1} bordered size="small">
+            {viewers.map((viewer, index) => (
+              <Descriptions.Item
+                key={viewer.userId}
+                label={`查看者 ${index + 1}`}
+              >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <UserOutlined />
+                  <Text>{viewer.username}</Text>
+                  <Text type="secondary">({viewer.email})</Text>
+                  <Text type="secondary">ID: {viewer.userId}</Text>
+                </span>
+              </Descriptions.Item>
+            ))}
+          </Descriptions>
+        ) : (
+          <Text type="secondary">无查看者</Text>
+        )}
+      </div>
     </div>
   );
 };
